@@ -1,6 +1,6 @@
 <?php
 
-namespace yiiunit\extensions\swiftmailer;
+namespace yiiunit\swiftmailer;
 
 use yii\helpers\ArrayHelper;
 

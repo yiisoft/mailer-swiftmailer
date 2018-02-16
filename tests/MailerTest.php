@@ -1,6 +1,6 @@
 <?php
 
-namespace yiiunit\extensions\swiftmailer;
+namespace yiiunit\swiftmailer;
 
 use Yii;
 use yii\swiftmailer\Mailer;

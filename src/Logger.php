@@ -7,6 +7,7 @@
 
 namespace yii\swiftmailer;
 
+use Psr\Log\LogLevel;
 use Yii;
 
 /**
@@ -55,31 +56,31 @@ use Yii;
 class Logger implements \Swift_Plugins_Logger
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function add($entry)
     {
         $categoryPrefix = substr($entry, 0, 2);
         switch ($categoryPrefix) {
             case '++':
-                $level = \yii\log\Logger::LEVEL_TRACE;
+                $level = LogLevel::DEBUG;
                 break;
             case '>>':
             case '<<':
-                $level = \yii\log\Logger::LEVEL_INFO;
+                $level = LogLevel::INFO;
                 break;
             case '!!':
-                $level = \yii\log\Logger::LEVEL_WARNING;
+                $level = LogLevel::WARNING;
                 break;
             default:
-                $level = \yii\log\Logger::LEVEL_INFO;
+                $level = LogLevel::INFO;
         }
 
-        Yii::getLogger()->log($entry, $level, __METHOD__);
+        Yii::getLogger()->log($level, $entry, ['category' => __METHOD__]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -87,7 +88,7 @@ class Logger implements \Swift_Plugins_Logger
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function dump()
     {

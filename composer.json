@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "yiisoft/yii2": "~2.0.4",
+        "yiisoft/yii2": "2.1.x-dev",
         "swiftmailer/swiftmailer": "~6.0"
     },
     "repositories": [
@@ -29,6 +29,9 @@
     ],
     "autoload": {
         "psr-4": { "yii\\swiftmailer\\": "src" }
+    },
+    "autoload-dev": {
+        "psr-4": {"yiiunit\\swiftmailer\\": "tests/"}
     },
     "extra": {
         "branch-alias": {

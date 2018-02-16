@@ -1,7 +1,8 @@
 <?php
 
-namespace yiiunit\extensions\swiftmailer;
+namespace yiiunit\swiftmailer;
 
+use Psr\Log\LogLevel;
 use Yii;
 use yii\swiftmailer\Logger;
 
@@ -23,28 +24,28 @@ class LoggerTest extends TestCase
                 '>> command sent',
                 [
                     'message' => '>> command sent',
-                    'level' => \yii\log\Logger::LEVEL_INFO,
+                    'level' => LogLevel::INFO,
                 ]
             ],
             [
                 '<< response received',
                 [
                     'message' => '<< response received',
-                    'level' => \yii\log\Logger::LEVEL_INFO,
+                    'level' => LogLevel::INFO,
                 ]
             ],
             [
                 '++ transport started',
                 [
                     'message' => '++ transport started',
-                    'level' => \yii\log\Logger::LEVEL_TRACE,
+                    'level' => LogLevel::DEBUG,
                 ]
             ],
             [
                 '!! error message',
                 [
                     'message' => '!! error message',
-                    'level' => \yii\log\Logger::LEVEL_WARNING,
+                    'level' => LogLevel::WARNING,
                 ]
             ],
         ];
@@ -64,7 +65,7 @@ class LoggerTest extends TestCase
 
         $logMessage = $this->getLastLogMessage();
 
-        $this->assertEquals($expectedLogMessage['message'], $logMessage[0]);
-        $this->assertEquals($expectedLogMessage['level'], $logMessage[1]);
+        $this->assertEquals($expectedLogMessage['level'], $logMessage[0]);
+        $this->assertEquals($expectedLogMessage['message'], $logMessage[1]);
     }
 }

@@ -20,9 +20,9 @@ use yii\mail\BaseMailer;
  * [
  *     'components' => [
  *         'mailer' => [
- *             'class' => 'yii\swiftmailer\Mailer',
+ *             'class' => yii\swiftmailer\Mailer::class,
  *             'transport' => [
- *                 'class' => 'Swift_SmtpTransport',
+ *                 'class' => Swift_SmtpTransport::class,
  *                 'host' => 'localhost',
  *                 'username' => 'username',
  *                 'password' => 'password',
@@ -45,11 +45,11 @@ use yii\mail\BaseMailer;
  *
  * ```php
  * 'transport' => [
- *     'class' => 'Swift_SmtpTransport',
+ *     'class' => Swift_SmtpTransport::class,
  *     'constructArgs' => ['localhost', 25]
  *     'plugins' => [
  *         [
- *             'class' => 'Swift_Plugins_ThrottlerPlugin',
+ *             'class' => Swift_Plugins_ThrottlerPlugin::class,
  *             'constructArgs' => [20],
  *         ],
  *     ],
@@ -80,7 +80,7 @@ class Mailer extends BaseMailer
     /**
      * @var string message default class name.
      */
-    public $messageClass = 'yii\swiftmailer\Message';
+    public $messageClass = Message::class;
     /**
      * @var bool whether to enable writing of the SwiftMailer internal logs using Yii log mechanism.
      * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
@@ -136,7 +136,7 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function sendMessage($message)
     {
