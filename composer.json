@@ -21,14 +21,8 @@
         "yiisoft/yii2": "2.1.x-dev",
         "swiftmailer/swiftmailer": "~6.0"
     },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        }
-    ],
     "autoload": {
-        "psr-4": { "yii\\swiftmailer\\": "src" }
+        "psr-4": {"yii\\swiftmailer\\": "src"}
     },
     "autoload-dev": {
         "psr-4": {"yiiunit\\swiftmailer\\": "tests/"}

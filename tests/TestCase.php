@@ -22,7 +22,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param array $config The application configuration, if needed
      * @param string $appClass name of the application class to create
      */
-    protected function mockApplication($config = [], $appClass = '\yii\console\Application')
+    protected function mockApplication($config = [], $appClass = \yii\console\Application::class)
     {
         new $appClass(ArrayHelper::merge([
             'id' => 'testapp',
