@@ -21,7 +21,7 @@ use Yii;
  * [
  *     'components' => [
  *         'mailer' => [
- *             'class' => 'yii\swiftmailer\Mailer',
+ *             '__class' => yii\swiftmailer\Mailer::class,
  *             'enableSwiftMailerLogging' => true,
  *         ],
  *      ],
@@ -39,7 +39,7 @@ use Yii;
  *         'log' => [
  *             'targets' => [
  *                 [
- *                     'class' => 'yii\log\FileTarget',
+ *                     '__class' => yii\log\FileTarget::class,
  *                     'categories' => ['yii\swiftmailer\Logger::add'],
  *                 ],
  *             ],

@@ -47,7 +47,7 @@ class MailerTest extends TestCase
         $mailer = new Mailer();
 
         $transportConfig = [
-            'class' => 'Swift_SmtpTransport',
+            '__class' => \Swift_SmtpTransport::class,
             'host' => 'localhost',
             'username' => 'username',
             'password' => 'password',
@@ -55,7 +55,7 @@ class MailerTest extends TestCase
         $mailer->setTransport($transportConfig);
         $transport = $mailer->getTransport();
         $this->assertTrue(is_object($transport), 'Unable to setup transport via config!');
-        $this->assertEquals($transportConfig['class'], get_class($transport), 'Invalid transport class!');
+        $this->assertEquals($transportConfig['__class'], get_class($transport), 'Invalid transport class!');
         $this->assertEquals($transportConfig['host'], $transport->getHost(), 'Invalid transport host!');
     }
 
@@ -66,12 +66,12 @@ class MailerTest extends TestCase
     {
         $mailer = new Mailer();
 
-        $class = 'Swift_SmtpTransport';
+        $class = \Swift_SmtpTransport::class;
         $host = 'some.test.host';
         $port = 999;
         $transportConfig = [
-            'class' => $class,
-            'constructArgs' => [
+            '__class' => $class,
+            '__construct()' => [
                 $host,
                 $port,
             ],
@@ -91,15 +91,15 @@ class MailerTest extends TestCase
     {
         $mailer = new Mailer();
 
-        $pluginClass = 'Swift_Plugins_ThrottlerPlugin';
+        $pluginClass = \Swift_Plugins_ThrottlerPlugin::class;
         $rate = 10;
 
         $transportConfig = [
-            'class' => 'Swift_SmtpTransport',
+            '__class' => \Swift_SmtpTransport::class,
             'plugins' => [
                 [
-                    'class' => $pluginClass,
-                    'constructArgs' => [
+                    '__class' => $pluginClass,
+                    '__construct()' => [
                         $rate,
                     ],
                 ],

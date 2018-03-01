@@ -51,7 +51,7 @@ return [
     //....
     'components' => [
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            '__class' => yii\swiftmailer\Mailer::class,
         ],
     ],
 ];

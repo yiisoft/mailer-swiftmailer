@@ -1,10 +1,10 @@
 Yii Framework 2 swiftmailer extension Change Log
 ================================================
 
-2.1.1 under development
+2.2.0 under development
 -----------------------
 
-- no changes in this release.
+- Chg: Required Yii framework version has been raised to '2.1.0' (klimov-paul)
 
 
 2.1.0 August 04, 2017

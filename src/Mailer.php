@@ -20,9 +20,9 @@ use yii\mail\BaseMailer;
  * [
  *     'components' => [
  *         'mailer' => [
- *             'class' => yii\swiftmailer\Mailer::class,
+ *             '__class' => yii\swiftmailer\Mailer::class,
  *             'transport' => [
- *                 'class' => Swift_SmtpTransport::class,
+ *                 '__class' => Swift_SmtpTransport::class,
  *                 'host' => 'localhost',
  *                 'username' => 'username',
  *                 'password' => 'password',
@@ -39,18 +39,18 @@ use yii\mail\BaseMailer;
  * You may also skip the configuration of the [[transport]] property. In that case, the default
  * `\Swift_SendmailTransport` transport will be used to send emails.
  *
- * You specify the transport constructor arguments using 'constructArgs' key in the config.
+ * You specify the transport constructor arguments using '__construct()' key in the config.
  * You can also specify the list of plugins, which should be registered to the transport using
  * 'plugins' key. For example:
  *
  * ```php
  * 'transport' => [
- *     'class' => Swift_SmtpTransport::class,
- *     'constructArgs' => ['localhost', 25]
+ *     '__class' => Swift_SmtpTransport::class,
+ *     '__construct()' => ['localhost', 25]
  *     'plugins' => [
  *         [
- *             'class' => Swift_Plugins_ThrottlerPlugin::class,
- *             'constructArgs' => [20],
+ *             '__class' => Swift_Plugins_ThrottlerPlugin::class,
+ *             '__construct()' => [20],
  *         ],
  *     ],
  * ],
@@ -167,8 +167,8 @@ class Mailer extends BaseMailer
      */
     protected function createTransport(array $config)
     {
-        if (!isset($config['class'])) {
-            $config['class'] = 'Swift_SendmailTransport';
+        if (!isset($config['__class'])) {
+            $config['__class'] = \Swift_SendmailTransport::class;
         }
         if (isset($config['plugins'])) {
             $plugins = $config['plugins'];
@@ -179,10 +179,10 @@ class Mailer extends BaseMailer
 
         if ($this->enableSwiftMailerLogging) {
             $plugins[] = [
-                'class' => 'Swift_Plugins_LoggerPlugin',
-                'constructArgs' => [
+                '__class' => \Swift_Plugins_LoggerPlugin::class,
+                '__construct()' => [
                     [
-                        'class' => 'yii\swiftmailer\Logger'
+                        '__class' => Logger::class
                     ]
                 ],
             ];
@@ -192,7 +192,7 @@ class Mailer extends BaseMailer
         $transport = $this->createSwiftObject($config);
         if (!empty($plugins)) {
             foreach ($plugins as $plugin) {
-                if (is_array($plugin) && isset($plugin['class'])) {
+                if (is_array($plugin) && isset($plugin['__class'])) {
                     $plugin = $this->createSwiftObject($plugin);
                 }
                 $transport->registerPlugin($plugin);
@@ -210,23 +210,23 @@ class Mailer extends BaseMailer
      */
     protected function createSwiftObject(array $config)
     {
-        if (isset($config['class'])) {
-            $className = $config['class'];
-            unset($config['class']);
+        if (isset($config['__class'])) {
+            $className = $config['__class'];
+            unset($config['__class']);
         } else {
-            throw new InvalidConfigException('Object configuration must be an array containing a "class" element.');
+            throw new InvalidConfigException('Object configuration must be an array containing a "__class" element.');
         }
 
-        if (isset($config['constructArgs'])) {
+        if (isset($config['__construct()'])) {
             $args = [];
-            foreach ($config['constructArgs'] as $arg) {
-                if (is_array($arg) && isset($arg['class'])) {
+            foreach ($config['__construct()'] as $arg) {
+                if (is_array($arg) && isset($arg['__class'])) {
                     $args[] = $this->createSwiftObject($arg);
                 } else {
                     $args[] = $arg;
                 }
             }
-            unset($config['constructArgs']);
+            unset($config['__construct()']);
             $object = Yii::createObject($className, $args);
         } else {
             $object = Yii::createObject($className);
