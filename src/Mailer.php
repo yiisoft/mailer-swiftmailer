@@ -8,7 +8,7 @@
 namespace yii\swiftmailer;
 
 use Yii;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\mail\BaseMailer;
 
 /**
@@ -162,7 +162,7 @@ class Mailer extends BaseMailer
     /**
      * Creates email transport instance by its array configuration.
      * @param array $config transport configuration.
-     * @throws \yii\base\InvalidConfigException on invalid transport configuration.
+     * @throws \yii\exceptions\InvalidConfigException on invalid transport configuration.
      * @return \Swift_Transport transport instance.
      */
     protected function createTransport(array $config)
@@ -206,7 +206,7 @@ class Mailer extends BaseMailer
      * Creates Swift library object, from given array configuration.
      * @param array $config object configuration
      * @return Object created object
-     * @throws \yii\base\InvalidConfigException on invalid configuration.
+     * @throws \yii\exceptions\InvalidConfigException on invalid configuration.
      */
     protected function createSwiftObject(array $config)
     {
