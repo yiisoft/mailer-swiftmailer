@@ -1,15 +1,15 @@
 {
-    "name": "yiisoft/yii-swiftmailer",
-    "description": "The SwiftMailer integration for the Yii framework",
+    "name": "yiisoft/yii-swift-mailer",
+    "description": "Yii Framework Swift Mailer Extension",
     "keywords": ["yii", "swift", "swiftmailer", "mail", "email", "mailer"],
-    "type": "yii-extension",
+    "type": "library",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/yiisoft/yii-swiftmailer/issues",
+        "issues": "https://github.com/yiisoft/yii-swift-mailer/issues",
         "forum": "http://www.yiiframework.com/forum/",
         "wiki": "http://www.yiiframework.com/wiki/",
         "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/yii-swiftmailer"
+        "source": "https://github.com/yiisoft/yii-swift-mailer"
     },
     "authors": [
         {
@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "yiisoft/core": "^3.0.0",
+        "yiisoft/core": "~1.0.0@dev",
         "swiftmailer/swiftmailer": "~6.0"
     },
     "autoload": {
@@ -29,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.0.x-dev"
         }
     }
 }
