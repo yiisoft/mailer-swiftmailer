@@ -1,15 +1,15 @@
 {
-    "name": "yiisoft/yii-swift-mailer",
+    "name": "yiisoft/yii-swiftmailer",
     "description": "Yii Framework Swift Mailer Extension",
     "keywords": ["yii", "swift", "swiftmailer", "mail", "email", "mailer"],
     "type": "library",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/yiisoft/yii-swift-mailer/issues",
+        "source": "https://github.com/yiisoft/yii-swiftmailer",
+        "issues": "https://github.com/yiisoft/yii-swiftmailer/issues",
         "forum": "http://www.yiiframework.com/forum/",
         "wiki": "http://www.yiiframework.com/wiki/",
-        "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/yii-swift-mailer"
+        "irc": "irc://irc.freenode.net/yii"
     },
     "authors": [
         {
