@@ -7,9 +7,9 @@
 
 namespace yii\swiftmailer;
 
-use Yii;
 use yii\exceptions\InvalidConfigException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Yii;
 use yii\mail\BaseMessage;
 
 /**
@@ -42,7 +42,7 @@ class Message extends BaseMessage
     /**
      * @var \Swift_Signer[] attached signers
      */
-    private $signers = [];
+    private $_signers = [];
 
 
     /**
@@ -336,13 +336,13 @@ class Message extends BaseMessage
      */
     public function setSignature($signature)
     {
-        if (!empty($this->signers)) {
-            // clear previously set signers
+        if (!empty($this->_signers)) {
+            // clear previously set _signers
             $swiftMessage = $this->getSwiftMessage();
-            foreach ($this->signers as $signer) {
+            foreach ($this->_signers as $signer) {
                 $swiftMessage->detachSigner($signer);
             }
-            $this->signers = [];
+            $this->_signers = [];
         }
         return $this->addSignature($signature);
     }
@@ -372,7 +372,7 @@ class Message extends BaseMessage
         }
 
         $this->getSwiftMessage()->attachSigner($signer);
-        $this->signers[] = $signer;
+        $this->_signers[] = $signer;
 
         return $this;
     }
