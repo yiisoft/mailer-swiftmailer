@@ -7,8 +7,8 @@
 
 namespace yii\swiftmailer;
 
-use Yii;
 use yii\exceptions\InvalidConfigException;
+use yii\helpers\Yii;
 use yii\mail\BaseMailer;
 
 /**
@@ -59,7 +59,7 @@ use yii\mail\BaseMailer;
  * To send an email, you may use the following code:
  *
  * ```php
- * Yii::$app->mailer->compose('contact/html', ['contactForm' => $form])
+ * Yii::getApp()->mailer->compose('contact/html', ['contactForm' => $form])
  *     ->setFrom('from@domain.com')
  *     ->setTo($form->email)
  *     ->setSubject($form->subject)

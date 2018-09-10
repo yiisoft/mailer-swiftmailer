@@ -8,7 +8,7 @@
 namespace yii\swiftmailer;
 
 use Psr\Log\LogLevel;
-use Yii;
+use yii\helpers\Yii;
 
 /**
  * Logger is a SwiftMailer plugin, which allows passing of the SwiftMailer internal logs to the
