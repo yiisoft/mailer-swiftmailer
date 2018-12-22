@@ -29,7 +29,5 @@ $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 
     $container = new Container(require Builder::path('tests'));
 
-    //Yii::setAlias('@yiiunit/captcha', __DIR__);
-    //Yii::setAlias('@yii/captcha', dirname(__DIR__) . '/src');
     Yii::setContainer($container);
 })();
