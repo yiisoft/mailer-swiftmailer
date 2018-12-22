@@ -2,37 +2,24 @@
 
 namespace yiiunit\swiftmailer;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\swiftmailer\Mailer;
 
 Yii::setAlias('@yii/swiftmailer', __DIR__ . '/../../../../extensions/swiftmailer');
 
-class MailerTest extends TestCase
+class MailerTest extends \yii\tests\TestCase
 {
     public function setUp()
     {
-        $this->mockApplication([
-            'components' => [
-                'email' => $this->createTestEmailComponent()
-            ]
-        ]);
-    }
-
-    /**
-     * @return Mailer test email component instance.
-     */
-    protected function createTestEmailComponent()
-    {
-        $component = new Mailer();
-
-        return $component;
+        parent::setUp();
+        $this->mockApplication();
     }
 
     // Tests :
 
     public function testSetupTransport()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer($this->app);
 
         $transport = new \Swift_SendmailTransport();
         $mailer->setTransport($transport);
@@ -44,7 +31,7 @@ class MailerTest extends TestCase
      */
     public function testConfigureTransport()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer($this->app);
 
         $transportConfig = [
             '__class' => \Swift_SmtpTransport::class,
@@ -64,7 +51,7 @@ class MailerTest extends TestCase
      */
     public function testConfigureTransportConstruct()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer($this->app);
 
         $class = \Swift_SmtpTransport::class;
         $host = 'some.test.host';
@@ -78,6 +65,7 @@ class MailerTest extends TestCase
         ];
         $mailer->setTransport($transportConfig);
         $transport = $mailer->getTransport();
+
         $this->assertTrue(is_object($transport), 'Unable to setup transport via config!');
         $this->assertEquals($class, get_class($transport), 'Invalid transport class!');
         $this->assertEquals($host, $transport->getHost(), 'Invalid transport host!');
@@ -89,7 +77,7 @@ class MailerTest extends TestCase
      */
     public function testConfigureTransportWithPlugins()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer($this->app);
 
         $pluginClass = \Swift_Plugins_ThrottlerPlugin::class;
         $rate = 10;
@@ -113,7 +101,7 @@ class MailerTest extends TestCase
 
     public function testGetSwiftMailer()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer($this->app);
         $this->assertTrue(is_object($mailer->getSwiftMailer()), 'Unable to get Swift mailer instance!');
     }
 }
