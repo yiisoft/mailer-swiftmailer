@@ -10,16 +10,16 @@ This extension provides a [SwiftMailer](https://swiftmailer.symfony.com/) mail s
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii-swift-mailer/v/stable.png)](https://packagist.org/packages/yiisoft/yii-swift-mailer)
-[![Total Downloads](https://poser.pugx.org/yiisoft/yii-swift-mailer/downloads.png)](https://packagist.org/packages/yiisoft/yii-swift-mailer)
-[![Build Status](https://travis-ci.org/yiisoft/yii-swift-mailer.svg?branch=master)](https://travis-ci.org/yiisoft/yii-swift-mailer)
+[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii-swiftmailer/v/stable.png)](https://packagist.org/packages/yiisoft/yii-swiftmailer)
+[![Total Downloads](https://poser.pugx.org/yiisoft/yii-swiftmailer/downloads.png)](https://packagist.org/packages/yiisoft/yii-swiftmailer)
+[![Build Status](https://travis-ci.org/yiisoft/yii-swiftmailer.svg?branch=master)](https://travis-ci.org/yiisoft/yii-swiftmailer)
 
 ## Installation
 
 The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 ```
-php composer.phar require --prefer-dist yiisoft/yii-swift-mailer
+php composer.phar require --prefer-dist yiisoft/yii-swiftmailer
 ```
 
 ## Usage
@@ -29,10 +29,8 @@ To use this extension,  simply add the following code in your application config
 ```php
 return [
     //....
-    'components' => [
-        'mailer' => [
-            '__class' => yii\swiftmailer\Mailer::class,
-        ],
+    'mailer' => [
+        '__class' => yii\swiftmailer\Mailer::class,
     ],
 ];
 ```
@@ -40,7 +38,7 @@ return [
 You can then send an email as follows:
 
 ```php
-Yii::$app->mailer->compose('contact/html')
+$app->get('mailer')->compose('contact/html')
      ->setFrom('from@domain.com')
      ->setTo($form->email)
      ->setSubject($form->subject)
