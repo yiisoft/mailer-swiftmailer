@@ -1,6 +1,6 @@
 <?php
 
-namespace yiiunit\swiftmailer;
+namespace yii\swiftmailer\tests;
 
 use Psr\Log\LogLevel;
 use yii\helpers\Yii;

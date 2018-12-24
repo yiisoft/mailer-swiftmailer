@@ -1,6 +1,6 @@
 <?php
 
-namespace yiiunit\swiftmailer;
+namespace yii\swiftmailer\tests;
 
 use yii\helpers\Yii;
 use yii\swiftmailer\Mailer;

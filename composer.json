@@ -35,7 +35,7 @@
         "psr-4": {"yii\\swiftmailer\\": "src"}
     },
     "autoload-dev": {
-        "psr-4": {"yiiunit\\swiftmailer\\": "tests"}
+        "psr-4": {"yii\\swiftmailer\\tests\\": "tests"}
     },
     "extra": {
         "branch-alias": {
