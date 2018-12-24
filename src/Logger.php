@@ -76,7 +76,7 @@ class Logger implements \Swift_Plugins_Logger
                 $level = LogLevel::INFO;
         }
 
-        Yii::getLogger()->log($level, $entry, ['category' => __METHOD__]);
+        Yii::log($level, $entry, ['category' => __METHOD__]);
     }
 
     /**
