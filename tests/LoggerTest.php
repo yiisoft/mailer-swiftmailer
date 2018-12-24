@@ -1,16 +1,23 @@
 <?php
 
-namespace yiiunit\swiftmailer;
+namespace yii\swiftmailer\tests;
 
 use Psr\Log\LogLevel;
-use Yii;
+use yii\helpers\Yii;
 use yii\swiftmailer\Logger;
 
-class LoggerTest extends TestCase
+class LoggerTest extends \yii\tests\TestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->mockApplication();
+        $_SERVER['REQUEST_URI'] = 'http://example.com/';
+    }
+
     protected function getLastLogMessage()
     {
-        return end(Yii::getLogger()->messages);
+        return end($this->container->get('logger')->messages);
     }
 
     /**

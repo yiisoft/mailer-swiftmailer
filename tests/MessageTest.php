@@ -1,9 +1,9 @@
 <?php
 
-namespace yiiunit\swiftmailer;
+namespace yii\swiftmailer\tests;
 
-use Yii;
 use yii\helpers\FileHelper;
+use yii\helpers\Yii;
 use yii\swiftmailer\Mailer;
 use yii\swiftmailer\Message;
 
@@ -14,21 +14,18 @@ Yii::setAlias('@yii/swiftmailer', __DIR__ . '/../../../../extensions/swiftmailer
  * @group mail
  * @group swiftmailer
  */
-class MessageTest extends TestCase
+class MessageTest extends \yii\tests\TestCase
 {
     /**
      * @var string test email address, which will be used as receiver for the messages.
      */
     protected $testEmailReceiver = 'someuser@somedomain.com';
 
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->mockApplication([
-            'components' => [
-                'mailer' => $this->createTestEmailComponent()
-            ]
-        ]);
+        parent::setUp();
+        $this->mockApplication();
+
         $filePath = $this->getTestFilePath();
         if (!file_exists($filePath)) {
             FileHelper::createDirectory($filePath);
@@ -48,19 +45,7 @@ class MessageTest extends TestCase
      */
     protected function getTestFilePath()
     {
-        return Yii::getAlias('@yiiunit/swiftmailer/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
-    }
-
-    /**
-     * @return Mailer test email component instance.
-     */
-    protected function createTestEmailComponent()
-    {
-        $component = new Mailer([
-            'useFileTransport' => true,
-        ]);
-
-        return $component;
+        return Yii::getAlias('@yii/swiftmailer/tests/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
     }
 
     /**
@@ -68,7 +53,7 @@ class MessageTest extends TestCase
      */
     protected function createTestMessage()
     {
-        return Yii::$app->get('mailer')->compose();
+        return $this->app->get('mailer')->compose();
     }
 
     /**
@@ -459,6 +444,9 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Swift Alternative Body Test');
         $message->setTextBody('Yii Swift test plain text body');
+
+      //  var_dump($message);
+      //  die;
 
         $serializedMessage = serialize($message);
         $this->assertNotEmpty($serializedMessage, 'Unable to serialize message!');
