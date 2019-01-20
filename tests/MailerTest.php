@@ -8,7 +8,7 @@ use yii\swiftmailer\Mailer;
 Yii::setAlias('@yii/swiftmailer', __DIR__ . '/../../../../extensions/swiftmailer');
 
 /**
- * Test Mailer class.
+ * Fake Mailer class.
  */
 class FakeMailer extends Mailer
 {
