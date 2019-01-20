@@ -7,12 +7,30 @@ use yii\swiftmailer\Mailer;
 
 Yii::setAlias('@yii/swiftmailer', __DIR__ . '/../../../../extensions/swiftmailer');
 
+/**
+ * Test Mailer class.
+ */
+class FakeMailer extends Mailer
+{
+    public $messageClass = 'yii\swiftmailer\Message';
+    public $sentMessages = [];
+    protected function sendMessage($message)
+    {
+        $this->sentMessages[] = $message;
+        return true;
+    }
+}
+
 class MailerTest extends \yii\tests\TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        $this->mockApplication();
+        $this->mockApplication([], null, [
+            'mailer' => [
+                '__class' => FakeMailer::class
+            ]
+        ]);
     }
 
     // Tests :

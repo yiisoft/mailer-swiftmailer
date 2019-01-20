@@ -440,13 +440,13 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
     {
         $message = $this->createTestMessage();
 
+        // Delete the mailer, that contains some closure that breaks the test. (Exception: Serialization of 'Closure' is not allowed)
+        $message->mailer = null;
+
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Swift Alternative Body Test');
         $message->setTextBody('Yii Swift test plain text body');
-
-      //  var_dump($message);
-      //  die;
 
         $serializedMessage = serialize($message);
         $this->assertNotEmpty($serializedMessage, 'Unable to serialize message!');
