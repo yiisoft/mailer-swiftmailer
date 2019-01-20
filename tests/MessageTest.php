@@ -445,9 +445,6 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
         $message->setSubject('Yii Swift Alternative Body Test');
         $message->setTextBody('Yii Swift test plain text body');
 
-      //  var_dump($message);
-      //  die;
-
         $serializedMessage = serialize($message);
         $this->assertNotEmpty($serializedMessage, 'Unable to serialize message!');
 
