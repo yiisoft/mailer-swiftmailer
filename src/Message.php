@@ -390,7 +390,7 @@ class Message extends BaseMessage
             throw new InvalidConfigException('Signature configuration should contain "type" key');
         }
         switch (strtolower($signature['type'])) {
-            case 'dkim' :
+            case 'dkim':
                 $domain = ArrayHelper::getValue($signature, 'domain', null);
                 $selector = ArrayHelper::getValue($signature, 'selector', null);
                 if (isset($signature['key'])) {
@@ -401,7 +401,7 @@ class Message extends BaseMessage
                     throw new InvalidConfigException("Either 'key' or 'file' signature option should be specified");
                 }
                 return new \Swift_Signers_DKIMSigner($privateKey, $domain, $selector);
-            case 'opendkim' :
+            case 'opendkim':
                 $domain = ArrayHelper::getValue($signature, 'domain', null);
                 $selector = ArrayHelper::getValue($signature, 'selector', null);
                 if (isset($signature['key'])) {
