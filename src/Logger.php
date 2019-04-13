@@ -39,7 +39,7 @@ use yii\helpers\Yii;
  *         'log' => [
  *             'targets' => [
  *                 [
- *                     '__class' => yii\log\FileTarget::class,
+ *                     '__class' => Yii\Log\FileTarget::class,
  *                     'categories' => ['yii\swiftmailer\Logger::add'],
  *                 ],
  *             ],
