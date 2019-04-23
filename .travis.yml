@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 7.1
   - 7.2
   - 7.3
 
@@ -20,7 +19,7 @@ install:
 
 before_script:
   - |
-    if [ $TRAVIS_PHP_VERSION = '7.1' ]; then
+    if [ $TRAVIS_PHP_VERSION = '7.3' ]; then
       PHPUNIT_FLAGS="--coverage-clover=coverage.clover"
     fi
 
