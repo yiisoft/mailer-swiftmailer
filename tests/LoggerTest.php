@@ -1,10 +1,9 @@
 <?php
 
-namespace yii\swiftmailer\tests;
+namespace Yiisoft\Yii\SwiftMailer\Tests;
 
 use Psr\Log\LogLevel;
-use yii\helpers\Yii;
-use yii\swiftmailer\Logger;
+use Yiisoft\Yii\SwiftMailer\Logger;
 
 class LoggerTest extends \yii\tests\TestCase
 {

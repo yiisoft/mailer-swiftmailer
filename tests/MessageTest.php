@@ -1,11 +1,11 @@
 <?php
 
-namespace yii\swiftmailer\tests;
+namespace Yiisoft\Yii\SwiftMailer\Tests;
 
 use yii\helpers\FileHelper;
 use yii\helpers\Yii;
-use yii\swiftmailer\Mailer;
-use yii\swiftmailer\Message;
+use Yiisoft\Yii\SwiftMailer\Mailer;
+use Yiisoft\Yii\SwiftMailer\Message;
 
 Yii::setAlias('@yii/swiftmailer', __DIR__ . '/../../../../extensions/swiftmailer');
 
@@ -45,7 +45,7 @@ class MessageTest extends \yii\tests\TestCase
      */
     protected function getTestFilePath()
     {
-        return Yii::getAlias('@yii/swiftmailer/tests/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
+        return $this->app->getAlias('@yii/swiftmailer/tests/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
     }
 
     /**
@@ -64,15 +64,15 @@ class MessageTest extends \yii\tests\TestCase
      */
     protected function createImageFile($fileName = 'test.jpg', $text = 'Test Image')
     {
-        if (!function_exists('imagecreatetruecolor')) {
+        if (!function_exists('imagejpeg')) {
             $this->markTestSkipped('GD lib required.');
         }
         $fileFullName = $this->getTestFilePath() . DIRECTORY_SEPARATOR . $fileName;
-        $image = imagecreatetruecolor(120, 20);
-        $textColor = imagecolorallocate($image, 233, 14, 91);
-        imagestring($image, 1, 5, 5, $text, $textColor);
-        imagejpeg($image, $fileFullName);
-        imagedestroy($image);
+        $image = \imagecreatetruecolor(120, 20);
+        $textColor = \imagecolorallocate($image, 233, 14, 91);
+        \imagestring($image, 1, 5, 5, $text, $textColor);
+        \imagejpeg($image, $fileFullName);
+        \imagedestroy($image);
 
         return $fileFullName;
     }

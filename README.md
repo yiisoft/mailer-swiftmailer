@@ -30,7 +30,7 @@ To use this extension,  simply add the following code in your application config
 return [
     //....
     'mailer' => [
-        '__class' => yii\swiftmailer\Mailer::class,
+        '__class' => Yiisoft\Yii\SwiftMailer\Mailer::class,
     ],
 ];
 ```

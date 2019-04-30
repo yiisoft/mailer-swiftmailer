@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\swiftmailer;
+namespace Yiisoft\Yii\SwiftMailer;
 
 use yii\exceptions\InvalidConfigException;
 use yii\helpers\Yii;

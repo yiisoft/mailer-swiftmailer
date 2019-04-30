@@ -1,9 +1,9 @@
 <?php
 
-namespace yii\swiftmailer\tests;
+namespace Yiisoft\Yii\SwiftMailer\Tests;
 
 use yii\helpers\Yii;
-use yii\swiftmailer\Mailer;
+use Yiisoft\Yii\SwiftMailer\Mailer;
 
 Yii::setAlias('@yii/swiftmailer', __DIR__ . '/../../../../extensions/swiftmailer');
 

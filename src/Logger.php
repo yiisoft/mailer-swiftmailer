@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\swiftmailer;
+namespace Yiisoft\Yii\SwiftMailer;
 
 use Psr\Log\LogLevel;
 use yii\helpers\Yii;
@@ -21,7 +21,7 @@ use yii\helpers\Yii;
  * [
  *     'components' => [
  *         'mailer' => [
- *             '__class' => yii\swiftmailer\Mailer::class,
+ *             '__class' => Yiisoft\Yii\SwiftMailer\Mailer::class,
  *             'enableSwiftMailerLogging' => true,
  *         ],
  *      ],
@@ -30,7 +30,7 @@ use yii\helpers\Yii;
  * ```
  *
  *
- * In order to catch logs written by this class, you need to setup a log route for 'yii\swiftmailer\Logger::add' category.
+ * In order to catch logs written by this class, you need to setup a log route for 'Yiisoft\Yii\SwiftMailer\Logger::add' category.
  * For example:
  *
  * ```php
@@ -40,7 +40,7 @@ use yii\helpers\Yii;
  *             'targets' => [
  *                 [
  *                     '__class' => Yiisoft\Log\FileTarget::class,
- *                     'categories' => ['yii\swiftmailer\Logger::add'],
+ *                     'categories' => ['Yiisoft\Yii\SwiftMailer\Logger::add'],
  *                 ],
  *             ],
  *         ],

@@ -33,16 +33,17 @@
         "yiisoft/yii-web": "^3.0@dev"
     },
     "autoload": {
-        "psr-4": {"yii\\swiftmailer\\": "src"}
+        "psr-4": {"Yiisoft\\Yii\\SwiftMailer\\": "src"}
     },
     "autoload-dev": {
-        "psr-4": {"yii\\swiftmailer\\tests\\": "tests"}
+        "psr-4": {"Yiisoft\\Yii\\SwiftMailer\\Tests\\": "tests"}
     },
     "extra": {
         "branch-alias": {
             "dev-master": "3.0.x-dev"
         },
         "config-plugin": {
+            "common": "config/common.php",
             "tests": "config/tests.php"
         }
     }
