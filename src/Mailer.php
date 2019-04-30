@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\swiftmailer;
+namespace Yiisoft\Yii\SwiftMailer;
 
 use yii\exceptions\InvalidConfigException;
 use yii\helpers\Yii;
@@ -20,7 +20,7 @@ use yii\mail\BaseMailer;
  * [
  *     'components' => [
  *         'mailer' => [
- *             '__class' => yii\swiftmailer\Mailer::class,
+ *             '__class' => Yiisoft\Yii\SwiftMailer\Mailer::class,
  *             'transport' => [
  *                 '__class' => Swift_SmtpTransport::class,
  *                 'host' => 'localhost',
