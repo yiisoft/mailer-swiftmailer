@@ -1,5 +1,5 @@
 {
-    "name": "yiisoft/yii-swiftmailer",
+    "name": "yiisoft/mailer-swiftmailer",
     "description": "Yii Framework Swift Mailer Extension",
     "keywords": ["yii", "swift", "swiftmailer", "mail", "email", "mailer"],
     "type": "library",
