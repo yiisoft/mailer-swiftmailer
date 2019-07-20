@@ -557,12 +557,12 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
 
     /**
      * @return string test file path.
-     * 
+     *
      * @throws \RuntimeException
      */
     protected function getTestFilePath(): string
     {
-        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR 
+        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR
             . str_replace('\\', '_', get_class($this)) . '_' . getmypid();
         
         if (!is_dir($dir) && mkdir($dir, 0777, true) === false) {

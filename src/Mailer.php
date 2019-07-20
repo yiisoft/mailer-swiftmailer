@@ -3,7 +3,10 @@ namespace Yiisoft\Mailer\SwiftMailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Mailer\{BaseMailer, Composer, MessageFactoryInterface, MessageInterface};
+use Yiisoft\Mailer\BaseMailer;
+use Yiisoft\Mailer\Composer;
+use Yiisoft\Mailer\MessageFactoryInterface;
+use Yiisoft\Mailer\MessageInterface;
 
 /**
  * Mailer implements a mailer based on SwiftMailer.
@@ -19,7 +22,7 @@ class Mailer extends BaseMailer
 
     /**
      * Returns transport instance.
-     * 
+     *
      * @return \Swift_Transport
      */
     public function getTransport(): \Swift_Transport
@@ -40,8 +43,7 @@ class Mailer extends BaseMailer
         EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         \Swift_Transport $transport
-    )
-    {
+    ) {
         parent::__construct($messageFactory, $composer, $eventDispatcher, $logger);
         $this->swiftMailer = new \Swift_Mailer($transport);
     }
@@ -57,9 +59,9 @@ class Mailer extends BaseMailer
 
     /**
      * Registers plugins.
-     * 
+     *
      * @param \Swift_Events_EventListener[] $plugins
-     * 
+     *
      * @return self
      */
     public function registerPlugins(array $plugins): self
@@ -73,9 +75,9 @@ class Mailer extends BaseMailer
 
     /**
      * Registers plugin.
-     * 
+     *
      * @see \Swift_Mailer::registerPlugins
-     * 
+     *
      * @return self
      */
     public function registerPlugin(\Swift_Events_EventListener $plugin): self

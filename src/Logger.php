@@ -1,7 +1,8 @@
 <?php
 namespace Yiisoft\Mailer\SwiftMailer;
 
-use Psr\Log\{LoggerInterface, LogLevel};
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Logger is a PSR-3 logger plugin for SwiftMailer.
