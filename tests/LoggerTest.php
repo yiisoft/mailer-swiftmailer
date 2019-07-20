@@ -1,29 +1,21 @@
 <?php
+namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
-namespace Yiisoft\Yii\SwiftMailer\Tests;
+use Psr\Log\{LoggerInterface, LogLevel};
+use Yiisoft\Mailer\SwiftMailer\Logger;
 
-use Psr\Log\LogLevel;
-use Yiisoft\Yii\SwiftMailer\Logger;
-
-class LoggerTest extends \yii\tests\TestCase
+class LoggerTest extends TestCase
 {
-    protected function setUp()
+    private function createLogger(): Logger
     {
-        parent::setUp();
-        $this->mockApplication();
-        $_SERVER['REQUEST_URI'] = 'http://example.com/';
-    }
-
-    protected function getLastLogMessage()
-    {
-        return end($this->container->get('logger')->messages);
+        return new Logger($this->get(LoggerInterface::class));
     }
 
     /**
      * Data provider for [[testAdd()]]
      * @return array test data
      */
-    public function dataProviderAdd()
+    public function dataProviderAdd(): array
     {
         return [
             [
@@ -54,6 +46,13 @@ class LoggerTest extends \yii\tests\TestCase
                     'level' => LogLevel::WARNING,
                 ]
             ],
+            [
+                '-- response received',
+                [
+                    'message' => '-- response received',
+                    'level' => LogLevel::INFO,
+                ]
+            ],
         ];
     }
 
@@ -63,15 +62,29 @@ class LoggerTest extends \yii\tests\TestCase
      * @param string $entry
      * @param array $expectedLogMessage
      */
-    public function testAdd($entry, array $expectedLogMessage)
+    public function testAdd($entry, array $expectedLogMessage): void
     {
-        $logger = new Logger();
+        /** @var \Yiisoft\Log\Logger $psrLogger */
+        $psrLogger = $this->get(LoggerInterface::class);
+        $logger = new Logger($psrLogger);
 
         $logger->add($entry);
 
-        $logMessage = $this->getLastLogMessage();
+        $logMessage = end($psrLogger->messages);
 
         $this->assertEquals($expectedLogMessage['level'], $logMessage[0]);
         $this->assertEquals($expectedLogMessage['message'], $logMessage[1]);
+    }
+
+    public function testClear(): void
+    {
+        $logger = $this->createLogger();
+        $this->assertNull($logger->clear());
+    }
+
+    public function testDump(): void
+    {
+        $logger = $this->createLogger();
+        $this->assertEquals('', $logger->dump());
     }
 }
