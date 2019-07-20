@@ -3,7 +3,7 @@ namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use Yiisoft\Mailer\SwiftMailer\Message;
 
-class Mailertest extends TestCase
+class MailerTest extends TestCase
 {
     public function testSetUp(): void
     {

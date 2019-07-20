@@ -1,7 +1,8 @@
 <?php
 namespace Yiisoft\Mailer\SwiftMailer;
 
-use Yiisoft\Mailer\{BaseMessage, MessageInterface};
+use Yiisoft\Mailer\BaseMessage;
+use Yiisoft\Mailer\MessageInterface;
 
 /**
  * Message implements a message class based on SwiftMailer.
@@ -152,7 +153,7 @@ class Message extends BaseMessage
      * Sets the message body.
      * If body is already set and its content type matches given one, it will
      * be overridden, if content type miss match the multipart message will be composed.
-     * 
+     *
      * @param string $body        body content.
      * @param string $contentType body content type.
      */
@@ -302,7 +303,7 @@ class Message extends BaseMessage
 
     /**
      * Returns the return-path (the bounce address) of this message.
-     * 
+     *
      * @return string the bounce email address.
      */
     public function getReturnPath(): string
@@ -312,9 +313,9 @@ class Message extends BaseMessage
 
     /**
      * Set the return-path (the bounce address) of this message.
-     * 
+     *
      * @param string $address the bounce email address.
-     * 
+     *
      * @return $this self reference.
      */
     public function setReturnPath(string $address): MessageInterface
@@ -326,7 +327,7 @@ class Message extends BaseMessage
 
     /**
      * Returns the priority of this message.
-     * 
+     *
      * @return int priority value as integer in range: `1..5`,
      * where 1 is the highest priority and 5 is the lowest.
      */
@@ -337,10 +338,10 @@ class Message extends BaseMessage
 
     /**
      * Set the priority of this message.
-     * 
+     *
      * @param int $priority priority value, should be an integer in range: `1..5`,
      * where 1 is the highest priority and 5 is the lowest.
-     * 
+     *
      * @return $this self reference.
      */
     public function setPriority(int $priority): MessageInterface
@@ -352,7 +353,7 @@ class Message extends BaseMessage
 
     /**
      * Get the addresses to which a read-receipt will be sent.
-     * 
+     *
      * @return string|array receipt receive email addresses.
      */
     public function getReadReceiptTo()
@@ -362,9 +363,9 @@ class Message extends BaseMessage
 
     /**
      * Sets the ask for a delivery receipt from the recipient to be sent to $addresses.
-     * 
+     *
      * @param string|array $addresses receipt receive email address(es).
-     * 
+     *
      * @return $this self reference.
      */
     public function setReadReceiptTo($addresses): MessageInterface
@@ -376,9 +377,9 @@ class Message extends BaseMessage
 
     /**
      * Attaches signers.
-     * 
+     *
      * @param \Swift_Signer[] $signers
-     * 
+     *
      * @return self
      */
     public function attachSigners(array $signers): self

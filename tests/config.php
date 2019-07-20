@@ -1,13 +1,21 @@
 <?php
-use Psr\EventDispatcher\{EventDispatcherInterface, ListenerProviderInterface};
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\EventDispatcher\{Dispatcher, Provider\Provider};
+use Yiisoft\EventDispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Log\Logger;
-use Yiisoft\Mailer\{Composer, MailerInterface, MessageFactory, MessageFactoryInterface};
-use Yiisoft\Mailer\SwiftMailer\{Logger as SwiftMailerLogger, Mailer, Message};
+use Yiisoft\Mailer\Composer;
+use Yiisoft\Mailer\MailerInterface;
+use Yiisoft\Mailer\MessageFactory;
+use Yiisoft\Mailer\MessageFactoryInterface;
+use Yiisoft\Mailer\SwiftMailer\Logger as SwiftMailerLogger;
+use Yiisoft\Mailer\SwiftMailer\Mailer;
+use Yiisoft\Mailer\SwiftMailer\Message;
 use Yiisoft\Mailer\SwiftMailer\Tests\TestTransport;
-use Yiisoft\View\{Theme, View};
+use Yiisoft\View\Theme;
+use Yiisoft\View\View;
 
 $tempDir = sys_get_temp_dir();
 return [

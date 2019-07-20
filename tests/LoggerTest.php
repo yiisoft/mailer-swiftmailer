@@ -1,7 +1,8 @@
 <?php
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
-use Psr\Log\{LoggerInterface, LogLevel};
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Yiisoft\Mailer\SwiftMailer\Logger;
 
 class LoggerTest extends TestCase
