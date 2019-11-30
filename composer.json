@@ -1,7 +1,14 @@
 {
     "name": "yiisoft/mailer-swiftmailer",
     "description": "Yii Framework Swift Mailer Extension",
-    "keywords": ["yii", "swift", "swiftmailer", "mail", "email", "mailer"],
+    "keywords": [
+        "yii",
+        "swift",
+        "swiftmailer",
+        "mail",
+        "email",
+        "mailer"
+    ],
     "type": "library",
     "license": "BSD-3-Clause",
     "support": {
@@ -31,14 +38,21 @@
         "yiisoft/log": "^3.0@dev"
     },
     "autoload": {
-        "psr-4": {"Yiisoft\\Mailer\\SwiftMailer\\": "src"}
+        "psr-4": {
+            "Yiisoft\\Mailer\\SwiftMailer\\": "src"
+        }
     },
     "autoload-dev": {
-        "psr-4": {"Yiisoft\\Mailer\\SwiftMailer\\Tests\\": "tests"}
+        "psr-4": {
+            "Yiisoft\\Mailer\\SwiftMailer\\Tests\\": "tests"
+        }
     },
     "extra": {
         "branch-alias": {
             "dev-master": "3.0.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
