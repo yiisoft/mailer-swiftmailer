@@ -259,18 +259,18 @@ class MessageTest extends TestCase
             ->setReadReceiptTo($readReceiptTo)
             ->toString();
 
-        $this->assertContains('charset=' . $charset, $messageString, 'Incorrect charset!');
-        $this->assertContains('Subject: ' . $subject, $messageString, 'Incorrect "Subject" header!');
-        $this->assertContains('From: ' . $from, $messageString, 'Incorrect "From" header!');
-        $this->assertContains('Reply-To: ' . $replyTo, $messageString, 'Incorrect "Reply-To" header!');
-        $this->assertContains('To: ' . $to, $messageString, 'Incorrect "To" header!');
-        $this->assertContains('Cc: ' . $cc, $messageString, 'Incorrect "Cc" header!');
-        $this->assertContains('Bcc: ' . $bcc, $messageString, 'Incorrect "Bcc" header!');
-        $this->assertContains("Return-Path: <{$returnPath}>", $messageString, 'Incorrect "Return-Path" header!');
-        $this->assertContains("X-Priority: 2 (High)", $messageString, 'Incorrect "Priority" header!');
-        $this->assertContains('Disposition-Notification-To: ' . $readReceiptTo, $messageString, 'Incorrect "Disposition-Notification-To" header!');
+        $this->assertStringContainsString('charset=' . $charset, $messageString, 'Incorrect charset!');
+        $this->assertStringContainsString('Subject: ' . $subject, $messageString, 'Incorrect "Subject" header!');
+        $this->assertStringContainsString('From: ' . $from, $messageString, 'Incorrect "From" header!');
+        $this->assertStringContainsString('Reply-To: ' . $replyTo, $messageString, 'Incorrect "Reply-To" header!');
+        $this->assertStringContainsString('To: ' . $to, $messageString, 'Incorrect "To" header!');
+        $this->assertStringContainsString('Cc: ' . $cc, $messageString, 'Incorrect "Cc" header!');
+        $this->assertStringContainsString('Bcc: ' . $bcc, $messageString, 'Incorrect "Bcc" header!');
+        $this->assertStringContainsString("Return-Path: <{$returnPath}>", $messageString, 'Incorrect "Return-Path" header!');
+        $this->assertStringContainsString('X-Priority: 2 (High)', $messageString, 'Incorrect "Priority" header!');
+        $this->assertStringContainsString('Disposition-Notification-To: ' . $readReceiptTo, $messageString, 'Incorrect "Disposition-Notification-To" header!');
     }
-    
+
     public function testSetupHeaders(): void
     {
         $messageString = $this->createMessage()
@@ -279,9 +279,9 @@ class MessageTest extends TestCase
             ->addHeader('Multiple', 'value2')
             ->toString();
 
-        $this->assertContains('Some: foo', $messageString, 'Unable to add header!');
-        $this->assertContains('Multiple: value1', $messageString, 'First value of multiple header lost!');
-        $this->assertContains('Multiple: value2', $messageString, 'Second value of multiple header lost!');
+        $this->assertStringContainsString('Some: foo', $messageString, 'Unable to add header!');
+        $this->assertStringContainsString('Multiple: value1', $messageString, 'First value of multiple header lost!');
+        $this->assertStringContainsString('Multiple: value2', $messageString, 'Second value of multiple header lost!');
 
         $messageString = $this->createMessage()
             ->setHeader('Some', 'foo')
@@ -289,10 +289,10 @@ class MessageTest extends TestCase
             ->setHeader('Multiple', ['value1', 'value2'])
             ->toString();
 
-        $this->assertContains('Some: override', $messageString, 'Unable to set header!');
-        $this->assertNotContains('Some: foo', $messageString, 'Unable to override header!');
-        $this->assertContains('Multiple: value1', $messageString, 'First value of multiple header lost!');
-        $this->assertContains('Multiple: value2', $messageString, 'Second value of multiple header lost!');
+        $this->assertStringContainsString('Some: override', $messageString, 'Unable to set header!');
+        $this->assertStringNotContainsString('Some: foo', $messageString, 'Unable to override header!');
+        $this->assertStringContainsString('Multiple: value1', $messageString, 'First value of multiple header lost!');
+        $this->assertStringContainsString('Multiple: value2', $messageString, 'Second value of multiple header lost!');
 
         $message = $this->createMessage();
         $message->setHeader('Some', 'foo');
@@ -331,7 +331,7 @@ class MessageTest extends TestCase
         $message->setHtmlBody('body2');
         $this->assertEquals('body2', $message->getHtmlBody());
     }
-    
+
     public function testAlternativeBodyCharset(): void
     {
         $message = $this->createMessage();
@@ -347,7 +347,7 @@ class MessageTest extends TestCase
         $content = $message->toString();
         $this->assertEquals(2, substr_count($content, $charset), 'Wrong charset for alternative body override.');
     }
-    
+
     public function testSendAlternativeBody()
     {
         $message = $this->createMessage()
@@ -396,7 +396,7 @@ class MessageTest extends TestCase
         $this->assertEquals($fileName, $attachment->getFilename(), 'Invalid file name!');
         $this->assertEquals($contentType, $attachment->getContentType(), 'Invalid content type!');
     }
-    
+
     public function testAttachFile(): void
     {
         $message = $this->createMessage();
@@ -414,7 +414,7 @@ class MessageTest extends TestCase
 
         $attachment = $this->getAttachment($message);
         $this->assertTrue(is_object($attachment), 'No attachment found!');
-        $this->assertContains($attachment->getFilename(), $options['fileName'], 'Invalid file name!');
+        $this->assertStringContainsString($attachment->getFilename(), $options['fileName'], 'Invalid file name!');
         $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
     }
 
@@ -453,7 +453,7 @@ class MessageTest extends TestCase
 
         $attachment = $this->getAttachment($message);
         $this->assertTrue(is_object($attachment), 'No attachment found!');
-        $this->assertContains($attachment->getFilename(), $fileName, 'Invalid file name!');
+        $this->assertStringContainsString($attachment->getFilename(), $fileName, 'Invalid file name!');
         $this->assertEquals($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
         $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
     }
@@ -564,11 +564,11 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
     {
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR
             . str_replace('\\', '_', get_class($this)) . '_' . getmypid();
-        
+
         if (!is_dir($dir) && mkdir($dir, 0777, true) === false) {
             throw new \RuntimeException('Unable to create temporary directory');
         }
-        
+
         return $dir;
     }
 }

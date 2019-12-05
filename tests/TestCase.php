@@ -14,14 +14,14 @@ abstract class TestCase extends BaseTestCase
      */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $config = require __DIR__ . '/config.php';
         $this->container = new Container($config);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->container = null;
         parent::tearDown();
@@ -38,5 +38,29 @@ abstract class TestCase extends BaseTestCase
     protected function getMailer(): Mailer
     {
         return $this->get(MailerInterface::class);
+    }
+
+    /**
+     * Gets an inaccessible object property.
+     * @param $object
+     * @param $propertyName
+     * @param bool $revoke whether to make property inaccessible after getting
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
+    {
+        $class = new \ReflectionClass($object);
+        while (!$class->hasProperty($propertyName)) {
+            $class = $class->getParentClass();
+        }
+        $property = $class->getProperty($propertyName);
+        $property->setAccessible(true);
+        $result = $property->getValue($object);
+        if ($revoke) {
+            $property->setAccessible(false);
+        }
+
+        return $result;
     }
 }
