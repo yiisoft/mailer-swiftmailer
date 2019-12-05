@@ -71,7 +71,9 @@ class LoggerTest extends TestCase
 
         $logger->add($entry);
 
-        $logMessage = end($psrLogger->messages);
+        $messages = $this->getInaccessibleProperty($psrLogger, 'messages');
+
+        $logMessage = end($messages);
 
         $this->assertEquals($expectedLogMessage['level'], $logMessage[0]);
         $this->assertEquals($expectedLogMessage['message'], $logMessage[1]);
