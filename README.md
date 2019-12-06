@@ -13,7 +13,7 @@ For license information check the [LICENSE](LICENSE.md)-file.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/mailer-swiftmailer/v/stable.png)](https://packagist.org/packages/yiisoft/mailer-swiftmailer)
 [![Total Downloads](https://poser.pugx.org/yiisoft/mailer-swiftmailer/downloads.png)](https://packagist.org/packages/yiisoft/mailer-swiftmailer)
-[![Build Status](https://travis-ci.org/yiisoft/mailer-swiftmailer.svg?branch=master)](https://travis-ci.org/yiisoft/mailer-swiftmailer)
+[![Build Status](https://travis-ci.com/yiisoft/mailer-swiftmailer.svg?branch=master)](https://travis-ci.com/yiisoft/mailer-swiftmailer)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/mailer-swiftmailer/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/mailer-swiftmailer/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/mailer-swiftmailer/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/mailer-swiftmailer/?branch=master)
 
