@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use Psr\Log\LoggerInterface;

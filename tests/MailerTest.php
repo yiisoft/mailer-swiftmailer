@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use Yiisoft\Mailer\SwiftMailer\Message;
@@ -10,7 +11,7 @@ class MailerTest extends TestCase
         $mailer = $this->getMailer();
         $this->assertEquals($this->get(TestTransport::class), $mailer->getTransport());
     }
-    
+
     public function testSend(): void
     {
         $mailer = $this->getMailer();
@@ -25,7 +26,7 @@ class MailerTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $mailer->send($invalidMsg);
     }
-    
+
     /**
      * @dataProvider dataProviderPlugins
      */
