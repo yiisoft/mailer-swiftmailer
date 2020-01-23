@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Mailer\SwiftMailer;
 
 use Yiisoft\Mailer\BaseMessage;
@@ -297,7 +298,7 @@ class Message extends BaseMessage
         foreach ($headers as $name => $value) {
             $this->setHeader($name, $value);
         }
-        
+
         return $this;
     }
 

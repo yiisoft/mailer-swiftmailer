@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 class TestTransport extends \Swift_Transport_EsmtpTransport

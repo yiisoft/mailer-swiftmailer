@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Mailer\SwiftMailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
