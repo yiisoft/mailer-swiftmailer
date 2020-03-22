@@ -450,7 +450,7 @@ class MessageTest extends TestCase
         $message->setTo('to@example.com');
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Swift Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid. '" alt="pic">');
+        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $attachment = $this->getAttachment($message);
         $this->assertTrue(is_object($attachment), 'No attachment found!');
