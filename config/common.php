@@ -22,7 +22,7 @@ return [
         '__class' => Composer::class,
         '__construct()' => [
             Reference::to(WebView::class),
-            $params['yiisoft/mailer']['composerView']
+            $params['yiisoft/mailer']['mailerInterface']['composerView']
         ]
     ],
 
@@ -38,6 +38,17 @@ return [
     Logger::class => [
         '__class' => Logger::class,
         '__construct()' => [Reference::to(LoggerInterface::class)]
+    ],
+
+    Swift_SmtpTransport::class => [
+        '__class' => Swift_SmtpTransport::class,
+        '__construct()' => [
+            $params['yiisoft/mailer']['swiftSmtpTransport']['host'],
+            $params['yiisoft/mailer']['swiftSmtpTransport']['port'],
+            $params['yiisoft/mailer']['swiftSmtpTransport']['encryption']
+        ],
+        'setUsername()' => [$params['yiisoft/mailer']['swiftSmtpTransport']['username']],
+        'setPassword()' => [$params['yiisoft/mailer']['swiftSmtpTransport']['password']]
     ],
 
     Swift_Plugins_LoggerPlugin::class => [
@@ -64,9 +75,10 @@ return [
             Reference::to(Composer::class),
             Reference::to(EventDispatcherInterface::class),
             Reference::to(LoggerInterface::class),
-            $params['yiisoft/mailer']['fileMailerStorage']
+            $params['yiisoft/mailer']['mailerInterface']['fileMailerStorage']
         ]
     ],
 
-    MailerInterface::class => $params['yiisoft/mailer']['writeToFiles'] ? FileMailer::class : Mailer::class
+    MailerInterface::class => $params['yiisoft/mailer']['mailerInterface']['writeToFiles']
+        ? FileMailer::class : Mailer::class
 ];
