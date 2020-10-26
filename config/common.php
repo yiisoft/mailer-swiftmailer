@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Mailer\Composer;
@@ -58,24 +57,13 @@ return [
 
     Mailer::class => [
         '__class' => Mailer::class,
-        '__construct()' => [
-            Reference::to(MessageFactoryInterface::class),
-            Reference::to(Composer::class),
-            Reference::to(EventDispatcherInterface::class),
-            Reference::to(LoggerInterface::class),
-            Reference::to(Swift_SmtpTransport::class)
-        ],
         'registerPlugin()' => [Reference::to(Swift_Plugins_LoggerPlugin::class)]
     ],
 
     FileMailer::class => [
         '__class' => FileMailer::class,
         '__construct()' => [
-            Reference::to(MessageFactoryInterface::class),
-            Reference::to(Composer::class),
-            Reference::to(EventDispatcherInterface::class),
-            Reference::to(LoggerInterface::class),
-            $params['yiisoft/mailer']['mailerInterface']['fileMailerStorage']
+            'path' => $params['yiisoft/mailer']['mailerInterface']['fileMailerStorage']
         ]
     ],
 
