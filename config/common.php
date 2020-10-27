@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Psr\Log\LoggerInterface;
+use Yiisoft\Aliases\Aliases;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Mailer\Composer;
 use Yiisoft\Mailer\FileMailer;
@@ -21,7 +22,7 @@ return [
         '__class' => Composer::class,
         '__construct()' => [
             Reference::to(WebView::class),
-            $params['yiisoft/mailer']['composer']['composerView']
+            fn (Aliases $aliases) => $aliases->get($params['yiisoft/mailer']['composer']['composerView'])
         ]
     ],
 
@@ -63,7 +64,9 @@ return [
     FileMailer::class => [
         '__class' => FileMailer::class,
         '__construct()' => [
-            'path' => $params['yiisoft/mailer']['fileMailer']['fileMailerStorage']
+            'path' => fn (Aliases $aliases) => $aliases->get(
+                $params['yiisoft/mailer']['fileMailer']['fileMailerStorage']
+            )
         ]
     ],
 
