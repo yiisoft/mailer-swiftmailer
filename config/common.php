@@ -21,7 +21,7 @@ return [
         '__class' => Composer::class,
         '__construct()' => [
             Reference::to(WebView::class),
-            $params['yiisoft/mailer']['mailer']['composerView']
+            $params['yiisoft/mailer']['composer']['composerView']
         ]
     ],
 
@@ -63,10 +63,10 @@ return [
     FileMailer::class => [
         '__class' => FileMailer::class,
         '__construct()' => [
-            'path' => $params['yiisoft/mailer']['mailer']['fileMailerStorage']
+            'path' => $params['yiisoft/mailer']['fileMailer']['fileMailerStorage']
         ]
     ],
 
-    MailerInterface::class => $params['yiisoft/mailer']['mailer']['writeToFiles']
+    MailerInterface::class => $params['yiisoft/mailer']['writeToFiles']
         ? FileMailer::class : Mailer::class
 ];

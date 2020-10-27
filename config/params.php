@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 return [
     'yiisoft/mailer' => [
-        'mailer' => [
-            'composerView' => dirname(__DIR__) . '/resources/mail',
-            'fileMailerStorage' => dirname(__DIR__) . '/runtime/mail',
-            'writeToFiles' => true
-        ]
+        'composer' => [
+            'composerView' => dirname(__DIR__) . '/resources/mail'
+        ],
+        'fileMailer' => [
+            'fileMailerStorage' => dirname(__DIR__) . '/runtime/mail'
+        ],
+        'writeToFiles' => true
     ],
     'swiftmailer/swiftmailer' => [
         'SwiftSmtpTransport' => [
