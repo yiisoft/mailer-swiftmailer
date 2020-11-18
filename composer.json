@@ -28,7 +28,7 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
-        "swiftmailer/swiftmailer": "~6.0",
+        "swiftmailer/swiftmailer": "~6.2",
         "yiisoft/mailer": "^3.0@dev"
     },
     "require-dev": {
