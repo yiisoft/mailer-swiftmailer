@@ -28,12 +28,12 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
-        "swiftmailer/swiftmailer": "~6.0",
+        "swiftmailer/swiftmailer": "^6.2",
         "yiisoft/mailer": "^3.0@dev"
     },
     "require-dev": {
-        "infection/infection": "^0.20.0",
         "phpunit/phpunit": "^9.4",
+        "roave/infection-static-analysis-plugin": "^1.4",
         "vimeo/psalm": "^4.1",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/event-dispatcher": "^3.0@dev",
