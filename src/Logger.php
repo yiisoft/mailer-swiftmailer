@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Mailer\SwiftMailer;
 
 use Psr\Log\LoggerInterface;
@@ -11,7 +13,7 @@ use Psr\Log\LogLevel;
 class Logger implements \Swift_Plugins_Logger
 {
     /**
-     * @var LoggerInterface $logger logger instance.
+     * @var LoggerInterface logger instance.
      */
     private $psrLogger;
 

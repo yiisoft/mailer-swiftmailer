@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -11,7 +13,7 @@ use Yiisoft\Mailer\SwiftMailer\Mailer;
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * @var ContainerInterface $container
+     * @var ContainerInterface
      */
     private $container;
 
@@ -43,11 +45,14 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Gets an inaccessible object property.
+     *
      * @param $object
      * @param $propertyName
      * @param bool $revoke whether to make property inaccessible after getting
-     * @return mixed
+     *
      * @throws \ReflectionException
+     *
+     * @return mixed
      */
     protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
     {

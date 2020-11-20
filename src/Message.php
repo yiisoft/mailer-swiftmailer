@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Mailer\SwiftMailer;
 
 use Yiisoft\Mailer\BaseMessage;
@@ -355,7 +357,7 @@ class Message extends BaseMessage
     /**
      * Get the addresses to which a read-receipt will be sent.
      *
-     * @return string|array receipt receive email addresses.
+     * @return array|string receipt receive email addresses.
      */
     public function getReadReceiptTo()
     {
@@ -365,7 +367,7 @@ class Message extends BaseMessage
     /**
      * Sets the ask for a delivery receipt from the recipient to be sent to $addresses.
      *
-     * @param string|array $addresses receipt receive email address(es).
+     * @param array|string $addresses receipt receive email address(es).
      *
      * @return $this self reference.
      */
