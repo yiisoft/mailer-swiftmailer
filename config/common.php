@@ -22,22 +22,22 @@ return [
         '__class' => Composer::class,
         '__construct()' => [
             Reference::to(WebView::class),
-            fn (Aliases $aliases) => $aliases->get($params['yiisoft/mailer']['composer']['composerView'])
-        ]
+            fn (Aliases $aliases) => $aliases->get($params['yiisoft/mailer']['composer']['composerView']),
+        ],
     ],
 
     MessageFactory::class => [
         '__class' => MessageFactory::class,
         '__construct()' => [
-            Message::class
-        ]
+            Message::class,
+        ],
     ],
 
     MessageFactoryInterface::class => MessageFactory::class,
 
     Logger::class => [
         '__class' => Logger::class,
-        '__construct()' => [Reference::to(LoggerInterface::class)]
+        '__construct()' => [Reference::to(LoggerInterface::class)],
     ],
 
     Swift_SmtpTransport::class => [
@@ -45,20 +45,20 @@ return [
         '__construct()' => [
             $params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['host'],
             $params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['port'],
-            $params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['encryption']
+            $params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['encryption'],
         ],
         'setUsername()' => [$params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['username']],
-        'setPassword()' => [$params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['password']]
+        'setPassword()' => [$params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['password']],
     ],
 
     Swift_Plugins_LoggerPlugin::class => [
         '__class' => Swift_Plugins_LoggerPlugin::class,
-        '__construct()' => [Reference::to(Logger::class)]
+        '__construct()' => [Reference::to(Logger::class)],
     ],
 
     Mailer::class => [
         '__class' => Mailer::class,
-        'registerPlugin()' => [Reference::to(Swift_Plugins_LoggerPlugin::class)]
+        'registerPlugin()' => [Reference::to(Swift_Plugins_LoggerPlugin::class)],
     ],
 
     FileMailer::class => [
@@ -66,10 +66,10 @@ return [
         '__construct()' => [
             'path' => fn (Aliases $aliases) => $aliases->get(
                 $params['yiisoft/mailer']['fileMailer']['fileMailerStorage']
-            )
-        ]
+            ),
+        ],
     ],
 
     MailerInterface::class => $params['yiisoft/mailer']['writeToFiles']
-        ? FileMailer::class : Mailer::class
+        ? FileMailer::class : Mailer::class,
 ];

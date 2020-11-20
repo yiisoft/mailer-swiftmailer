@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 class TestTransport extends \Swift_Transport_EsmtpTransport
 {
     /**
-     * @var Swift_Events_EventListener[] $plugins
+     * @var Swift_Events_EventListener[]
      */
     public $plugins;
 

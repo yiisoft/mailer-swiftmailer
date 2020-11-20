@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use Yiisoft\Mailer\SwiftMailer\Message;
@@ -68,7 +70,7 @@ class MessageTest extends TestCase
         return [
             [
                 'foo@example.com',
-                ['foo@example.com' => null]
+                ['foo@example.com' => null],
             ],
             [
                 ['foo@example.com', 'bar@example.com'],
@@ -76,11 +78,11 @@ class MessageTest extends TestCase
             ],
             [
                 ['foo@example.com' => 'foo'],
-                ['foo@example.com' => 'foo']
+                ['foo@example.com' => 'foo'],
             ],
             [
                 ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
-                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar']
+                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
             ],
         ];
     }
@@ -140,7 +142,7 @@ class MessageTest extends TestCase
         return [
             [
                 'foo@example.com',
-                ['foo@example.com' => null]
+                ['foo@example.com' => null],
             ],
             [
                 ['foo@example.com', 'bar@example.com'],
@@ -148,11 +150,11 @@ class MessageTest extends TestCase
             ],
             [
                 ['foo@example.com' => 'foo'],
-                ['foo@example.com' => 'foo']
+                ['foo@example.com' => 'foo'],
             ],
             [
                 ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
-                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar']
+                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
             ],
         ];
     }
@@ -393,7 +395,7 @@ class MessageTest extends TestCase
         $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertEquals($fileName, $attachment->getFilename(), 'Invalid file name!');
         $this->assertEquals($contentType, $attachment->getContentType(), 'Invalid content type!');
     }
@@ -414,7 +416,7 @@ class MessageTest extends TestCase
         $message->attach($fileName, $options);
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertStringContainsString($attachment->getFilename(), $options['fileName'], 'Invalid file name!');
         $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
     }
@@ -433,7 +435,7 @@ class MessageTest extends TestCase
         $message->attachContent($fileContent, $options);
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertEquals($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
         $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
     }
@@ -453,7 +455,7 @@ class MessageTest extends TestCase
         $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertStringContainsString($attachment->getFilename(), $fileName, 'Invalid file name!');
         $this->assertEquals($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
         $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
@@ -473,7 +475,7 @@ class MessageTest extends TestCase
         $this->assertEquals($signers, $headerSigners);
     }
 
-    private $privateKey = "-----BEGIN RSA PRIVATE KEY-----
+    private $privateKey = '-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAyehiMTRxvfQz8nbQQAgL481QipVMF+E7ljWKHTQQSYfqktR+
 zFYqX81vKeK9/2D6AiK5KJSBVdF7aURasppuDaxFJWrPvacd3IQCrGxsGkwwlWPO
 ggB1WpOEKhVUZnGzdm96Fk23oHFKrEiQlSG0cB9P/wUKz57b8tsaPve5sKBG0Kww
@@ -500,7 +502,7 @@ tphI6QKBgQDobarzJhVUdME4QKAlhJecKBO1xlVCXWbKGdRcJn0Gzq6iwZKdx64C
 hQGpKaZBDDCHLk7dDzoKXF1udriW9EcImh09uIKGYYWS8poy8NUzmZ3fy/1o2C2O
 U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
 -----END RSA PRIVATE KEY-----
-";
+';
 
     public function dataProviderSigners(): array
     {
@@ -515,8 +517,10 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
 
     /**
      * Creates image file with given text.
+     *
      * @param  string $fileName file name.
      * @param  string $text     text to be applied on image.
+     *
      * @return string image file full name.
      */
     protected function createImageFile(string $fileName = 'test.jpg', string $text = 'Test Image'): string
@@ -539,8 +543,10 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
 
     /**
      * Finds the attachment object in the message.
+     *
      * @param  Message                     $message message instance
-     * @return null|\Swift_Mime_Attachment attachment instance.
+     *
+     * @return \Swift_Mime_Attachment|null attachment instance.
      */
     protected function getAttachment(Message $message)
     {
@@ -557,14 +563,14 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
     }
 
     /**
-     * @return string test file path.
-     *
      * @throws \RuntimeException
+     *
+     * @return string test file path.
      */
     protected function getTestFilePath(): string
     {
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR
-            . str_replace('\\', '_', get_class($this)) . '_' . getmypid();
+            . str_replace('\\', '_', static::class) . '_' . getmypid();
 
         if (!is_dir($dir) && mkdir($dir, 0777, true) === false) {
             throw new \RuntimeException('Unable to create temporary directory');

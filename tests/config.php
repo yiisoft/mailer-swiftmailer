@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerInterface;
@@ -26,7 +28,7 @@ return [
     EventDispatcherInterface::class => [
         '__class' => Dispatcher::class,
         '__construct()' => [
-           'listenerProvider' => Reference::to(ListenerProviderInterface::class)
+            'listenerProvider' => Reference::to(ListenerProviderInterface::class),
         ],
     ],
     LoggerInterface::class => [
@@ -41,10 +43,10 @@ return [
     View::class => [
         '__class' => View::class,
         '__construct()' => [
-            'basePath'=> $tempDir . DIRECTORY_SEPARATOR . 'views',
-            'theme'=> Reference::to(Theme::class),
+            'basePath' => $tempDir . DIRECTORY_SEPARATOR . 'views',
+            'theme' => Reference::to(Theme::class),
             'eventDispatcher' => Reference::to(EventDispatcherInterface::class),
-            'logger' => Reference::to(LoggerInterface::class)
+            'logger' => Reference::to(LoggerInterface::class),
         ],
     ],
     MessageFactoryInterface::class => [
@@ -57,7 +59,7 @@ return [
         '__class' => Composer::class,
         '__construct()' => [
             'view' => Reference::to(View::class),
-            'viewPath' => $tempDir . DIRECTORY_SEPARATOR . 'views'
+            'viewPath' => $tempDir . DIRECTORY_SEPARATOR . 'views',
         ],
     ],
     \Swift_Transport::class => [
@@ -72,10 +74,10 @@ return [
     MailerInterface::class => [
         '__class' => Mailer::class,
         '__construct()' => [
-            'messageFactory'=> Reference::to(MessageFactoryInterface::class),
-            'composer'=> Reference::to(Composer::class),
+            'messageFactory' => Reference::to(MessageFactoryInterface::class),
+            'composer' => Reference::to(Composer::class),
             'eventDispatcher' => Reference::to(EventDispatcherInterface::class),
-            'logger'=> Reference::to(LoggerInterface::class),
+            'logger' => Reference::to(LoggerInterface::class),
             'transport' => Reference::to(\Swift_Transport::class),
         ],
         'registerPlugins' => [
