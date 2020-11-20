@@ -5,12 +5,12 @@ declare(strict_types=1);
 return [
     'yiisoft/mailer' => [
         'composer' => [
-            'composerView' => '@resources/mail'
+            'composerView' => '@resources/mail',
         ],
         'fileMailer' => [
-            'fileMailerStorage' => '@runtime/mail'
+            'fileMailerStorage' => '@runtime/mail',
         ],
-        'writeToFiles' => true
+        'writeToFiles' => true,
     ],
     'swiftmailer/swiftmailer' => [
         'SwiftSmtpTransport' => [
@@ -18,7 +18,7 @@ return [
             'port' => 25,
             'encryption' => null,
             'username' => 'admin@example.com',
-            'password' => ''
-        ]
-    ]
+            'password' => '',
+        ],
+    ],
 ];

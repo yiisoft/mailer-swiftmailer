@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use Psr\Log\LoggerInterface;
@@ -15,6 +17,7 @@ class LoggerTest extends TestCase
 
     /**
      * Data provider for [[testAdd()]]
+     *
      * @return array test data
      */
     public function dataProviderAdd(): array
@@ -25,35 +28,35 @@ class LoggerTest extends TestCase
                 [
                     'message' => '>> command sent',
                     'level' => LogLevel::INFO,
-                ]
+                ],
             ],
             [
                 '<< response received',
                 [
                     'message' => '<< response received',
                     'level' => LogLevel::INFO,
-                ]
+                ],
             ],
             [
                 '++ transport started',
                 [
                     'message' => '++ transport started',
                     'level' => LogLevel::DEBUG,
-                ]
+                ],
             ],
             [
                 '!! error message',
                 [
                     'message' => '!! error message',
                     'level' => LogLevel::WARNING,
-                ]
+                ],
             ],
             [
                 '-- response received',
                 [
                     'message' => '-- response received',
                     'level' => LogLevel::INFO,
-                ]
+                ],
             ],
         ];
     }
