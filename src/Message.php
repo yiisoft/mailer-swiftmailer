@@ -336,7 +336,7 @@ class Message extends BaseMessage
      */
     public function getPriority(): int
     {
-        return $this->swiftMessage->getPriority();
+        return (int)$this->swiftMessage->getPriority();
     }
 
     /**
