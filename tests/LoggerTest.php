@@ -67,7 +67,7 @@ class LoggerTest extends TestCase
      * @param string $entry
      * @param array $expectedLogMessage
      */
-    public function testAdd($entry, array $expectedLogMessage): void
+    public function testAdd(string $entry, array $expectedLogMessage): void
     {
         /** @var \Yiisoft\Log\Logger $psrLogger */
         $psrLogger = $this->get(LoggerInterface::class);
@@ -79,8 +79,8 @@ class LoggerTest extends TestCase
 
         $logMessage = end($messages);
 
-        $this->assertEquals($expectedLogMessage['level'], $logMessage[0]);
-        $this->assertEquals($expectedLogMessage['message'], $logMessage[1]);
+        $this->assertEquals($expectedLogMessage['level'], $logMessage->level());
+        $this->assertEquals($expectedLogMessage['message'], $logMessage->message());
     }
 
     public function testClear(): void
