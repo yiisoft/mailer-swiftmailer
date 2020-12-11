@@ -128,7 +128,7 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderRecipients
+     * @dataProvider dataProviderReadReceiptTo
      */
     public function testReadReceiptTo($to, $expected): void
     {
@@ -142,6 +142,28 @@ class MessageTest extends TestCase
         return [
             [
                 'foo@example.com',
+                ['foo@example.com' => null],
+            ],
+            [
+                ['foo@example.com', 'bar@example.com'],
+                ['foo@example.com' => null, 'bar@example.com' => null],
+            ],
+            [
+                ['foo@example.com' => 'foo'],
+                ['foo@example.com' => 'foo'],
+            ],
+            [
+                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
+                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
+            ],
+        ];
+    }
+
+    public function dataProviderReadReceiptTo(): array
+    {
+        return [
+            [
+                ['foo@example.com'],
                 ['foo@example.com' => null],
             ],
             [

@@ -25,7 +25,7 @@ class Logger implements \Swift_Plugins_Logger
         $this->psrLogger = $psrLogger;
     }
 
-    public function add($entry)
+    public function add($entry): void
     {
         $categoryPrefix = substr($entry, 0, 2);
         switch ($categoryPrefix) {
@@ -46,7 +46,7 @@ class Logger implements \Swift_Plugins_Logger
         $this->psrLogger->log($level, $entry, ['category' => __METHOD__]);
     }
 
-    public function clear()
+    public function clear(): void
     {
         // do nothing
     }
