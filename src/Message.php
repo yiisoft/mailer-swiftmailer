@@ -18,7 +18,7 @@ class Message extends BaseMessage
     /**
      * @var \Swift_Message Swift message instance.
      */
-    private $swiftMessage;
+    private \Swift_Message $swiftMessage;
 
     /**
      * @return \Swift_Message Swift message instance.
@@ -39,9 +39,7 @@ class Message extends BaseMessage
      */
     public function __clone()
     {
-        if (is_object($this->swiftMessage)) {
-            $this->swiftMessage = clone $this->swiftMessage;
-        }
+        $this->swiftMessage = clone $this->swiftMessage;
     }
 
     public function getCharset(): string
@@ -170,7 +168,10 @@ class Message extends BaseMessage
             $partFound = false;
             foreach ($parts as $key => $part) {
                 if (!($part instanceof \Swift_Mime_Attachment)) {
-                    /* @var $part \Swift_Mime_MimePart */
+                    /**
+                     * @var \Swift_Mime_MimePart $part
+                     * @psalm-suppress UndefinedMethod
+                     */
                     if ($part->getContentType() == $contentType) {
                         $charset = $part->getCharset();
                         unset($parts[$key]);
@@ -192,7 +193,7 @@ class Message extends BaseMessage
                 $message->setBody($body, $contentType);
             } else {
                 $message->setBody(null);
-                $message->setContentType(null);
+                $message->setContentType('');
                 $message->addPart($oldBody, $oldContentType, $charset);
                 $message->addPart($body, $contentType, $charset);
             }
@@ -336,6 +337,7 @@ class Message extends BaseMessage
      */
     public function getPriority(): int
     {
+        /** @psalm-suppress RedundantCastGivenDocblockType */
         return (int)$this->swiftMessage->getPriority();
     }
 
@@ -367,7 +369,7 @@ class Message extends BaseMessage
     /**
      * Sets the ask for a delivery receipt from the recipient to be sent to $addresses.
      *
-     * @param array|string $addresses receipt receive email address(es).
+     * @param array $addresses receipt receive email address(es).
      *
      * @return $this self reference.
      */
