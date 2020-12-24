@@ -51,6 +51,8 @@ return [
         'setPassword()' => [$params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['password']],
     ],
 
+    Swift_Transport::class => Swift_SmtpTransport::class,
+
     Swift_Plugins_LoggerPlugin::class => [
         '__class' => Swift_Plugins_LoggerPlugin::class,
         '__construct()' => [Reference::to(Logger::class)],
