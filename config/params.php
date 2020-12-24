@@ -10,6 +10,7 @@ return [
         'fileMailer' => [
             'fileMailerStorage' => '@runtime/mail',
         ],
+        'useSendmail' => false,
         'writeToFiles' => true,
     ],
     'swiftmailer/swiftmailer' => [

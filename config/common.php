@@ -51,7 +51,8 @@ return [
         'setPassword()' => [$params['swiftmailer/swiftmailer']['SwiftSmtpTransport']['password']],
     ],
 
-    Swift_Transport::class => Swift_SmtpTransport::class,
+    Swift_Transport::class => $params['yiisoft/mailer']['useSendmail']
+        ? Swift_SendmailTransport::class : Swift_SmtpTransport::class,
 
     Swift_Plugins_LoggerPlugin::class => [
         '__class' => Swift_Plugins_LoggerPlugin::class,
