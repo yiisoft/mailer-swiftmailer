@@ -1,24 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<phpunit bootstrap="./vendor/autoload.php"
-	colors="true"
-	verbose="true"
-	convertErrorsToExceptions="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	stopOnFailure="false">
-	<testsuites>
-		<testsuite name="Yii2-swiftmailer Test Suite">
-			<directory>./tests</directory>
-		</testsuite>
-	</testsuites>
+<?xml version="1.0" encoding="UTF-8"?>
 
-    <filter>
-        <whitelist>
-            <directory>./</directory>
-            <exclude>
-                <directory>./tests</directory>
-                <directory>./vendor</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false"
+         executionOrder="random"
+>
+<php>
+    <ini name="error_reporting" value="-1"/>
+</php>
+
+<testsuites>
+    <testsuite name="Yii Mailer Library - Swift Mailer Extension">
+        <directory>./tests</directory>
+    </testsuite>
+</testsuites>
+
+<coverage>
+    <include>
+        <directory>./src</directory>
+    </include>
+</coverage>
 </phpunit>
