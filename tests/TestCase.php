@@ -4,69 +4,109 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
-use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use ReflectionClass;
+use Swift_Transport;
 use Yiisoft\Di\Container;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\Provider;
+use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Mailer\MailerInterface;
+use Yiisoft\Mailer\MessageBodyRenderer;
+use Yiisoft\Mailer\MessageFactory;
+use Yiisoft\Mailer\MessageFactoryInterface;
 use Yiisoft\Mailer\SwiftMailer\Mailer;
+use Yiisoft\Mailer\SwiftMailer\Message;
+use Yiisoft\Mailer\SwiftMailer\Tests\TestAsset\DummyTransport;
+use Yiisoft\View\View;
 
-abstract class TestCase extends BaseTestCase
+use function sys_get_temp_dir;
+
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ?ContainerInterface $container = null;
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $config = require __DIR__ . '/config.php';
-        $this->container = new Container($config);
+        $this->getContainer();
     }
 
     protected function tearDown(): void
     {
         $this->container = null;
-        parent::tearDown();
     }
 
-    protected function get($id)
+    protected function get(string $id)
     {
         return $this->container->get($id);
     }
 
     /**
-     * @return Mailer mailer instance.
-     */
-    protected function getMailer(): Mailer
-    {
-        return $this->get(MailerInterface::class);
-    }
-
-    /**
      * Gets an inaccessible object property.
      *
-     * @param $object
-     * @param $propertyName
-     * @param bool $revoke whether to make property inaccessible after getting
-     *
-     * @throws \ReflectionException
+     * @param object $object
+     * @param string $propertyName
      *
      * @return mixed
      */
-    protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
+    protected function getInaccessibleProperty(object $object, string $propertyName)
     {
-        $class = new \ReflectionClass($object);
+        $class = new ReflectionClass($object);
+
         while (!$class->hasProperty($propertyName)) {
             $class = $class->getParentClass();
         }
+
         $property = $class->getProperty($propertyName);
         $property->setAccessible(true);
         $result = $property->getValue($object);
-        if ($revoke) {
-            $property->setAccessible(false);
-        }
+        $property->setAccessible(false);
 
         return $result;
+    }
+
+    private function getContainer(): ContainerInterface
+    {
+        if ($this->container === null) {
+            $tempDir = sys_get_temp_dir();
+
+            $this->container = new Container([
+                View::class => [
+                    '__class' => View::class,
+                    '__construct()' => [
+                        'basePath' => $tempDir,
+                    ],
+                ],
+
+                MessageFactoryInterface::class => [
+                    '__class' => MessageFactory::class,
+                    '__construct()' => [
+                        'class' => Message::class,
+                    ],
+                ],
+
+                MessageBodyRenderer::class => [
+                    '__class' => MessageBodyRenderer::class,
+                    '__construct()' => [
+                        'view' => Reference::to(View::class),
+                        'viewPath' => $tempDir,
+                        'htmlLayout' => '',
+                        'textLayout' => '',
+                    ],
+                ],
+
+                MailerInterface::class => Mailer::class,
+                LoggerInterface::class => NullLogger::class,
+                Swift_Transport::class => DummyTransport::class,
+                EventDispatcherInterface::class => Dispatcher::class,
+                ListenerProviderInterface::class => Provider::class,
+            ]);
+        }
+
+        return $this->container;
     }
 }
