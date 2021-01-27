@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Factory\Definitions\Reference;
-use Yiisoft\Mailer\Composer;
 use Yiisoft\Mailer\FileMailer;
 use Yiisoft\Mailer\MailerInterface;
+use Yiisoft\Mailer\MessageBodyRenderer;
 use Yiisoft\Mailer\MessageFactory;
 use Yiisoft\Mailer\MessageFactoryInterface;
-use Yiisoft\Mailer\SwiftMailer\Logger;
 use Yiisoft\Mailer\SwiftMailer\Mailer;
 use Yiisoft\Mailer\SwiftMailer\Message;
 use Yiisoft\View\WebView;
@@ -18,26 +16,19 @@ use Yiisoft\View\WebView;
 /** @var array $params */
 
 return [
-    Composer::class => [
-        '__class' => Composer::class,
+    MessageBodyRenderer::class => [
+        '__class' => MessageBodyRenderer::class,
         '__construct()' => [
             Reference::to(WebView::class),
-            fn (Aliases $aliases) => $aliases->get($params['yiisoft/mailer']['composer']['composerView']),
+            static fn (Aliases $aliases) => $aliases->get($params['yiisoft/mailer']['messageBodyRenderer']['viewPath']),
         ],
     ],
 
-    MessageFactory::class => [
+    MessageFactoryInterface::class => [
         '__class' => MessageFactory::class,
         '__construct()' => [
             Message::class,
         ],
-    ],
-
-    MessageFactoryInterface::class => MessageFactory::class,
-
-    Logger::class => [
-        '__class' => Logger::class,
-        '__construct()' => [Reference::to(LoggerInterface::class)],
     ],
 
     Swift_SmtpTransport::class => [
@@ -53,16 +44,6 @@ return [
 
     Swift_Transport::class => $params['yiisoft/mailer']['useSendmail']
         ? Swift_SendmailTransport::class : Swift_SmtpTransport::class,
-
-    Swift_Plugins_LoggerPlugin::class => [
-        '__class' => Swift_Plugins_LoggerPlugin::class,
-        '__construct()' => [Reference::to(Logger::class)],
-    ],
-
-    Mailer::class => [
-        '__class' => Mailer::class,
-        'registerPlugin()' => [Reference::to(Swift_Plugins_LoggerPlugin::class)],
-    ],
 
     FileMailer::class => [
         '__class' => FileMailer::class,

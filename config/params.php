@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 return [
     'yiisoft/mailer' => [
-        'composer' => [
-            'composerView' => '@resources/mail',
+        'messageBodyRenderer' => [
+            'viewPath' => '@resources/mail',
         ],
         'fileMailer' => [
             'fileMailerStorage' => '@runtime/mail',
