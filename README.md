@@ -1,15 +1,13 @@
 <p align="center">
-    <a href="https://swiftmailer.symfony.com/" target="_blank" rel="external">
-        <img src="https://swiftmailer.symfony.com/images/logo.png" height="68px" style="background-color:#2a4fb7">
+    <a href="https://github.com/yiisoft" target="_blank">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="68px">
     </a>
-    <h1 align="center">Yii Framework Swift Mailer Extension</h1>
+    <a href="https://swiftmailer.symfony.com/" target="_blank" rel="external">
+        <img src="https://swiftmailer.symfony.com/images/logo.png" height="68px">
+    </a>
+    <h1 align="center">Yii Mailer Library - Swift Mailer Extension</h1>
     <br>
 </p>
-
-This library is a [Mailer](https://github.com/yiisoft/mailer) implementation that provides a [SwiftMailer](https://swiftmailer.symfony.com/) mail solution 
-for [Yii framework](http://www.yiiframework.com).
-
-For license information check the [LICENSE](LICENSE.md)-file.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/mailer-swiftmailer/v/stable.png)](https://packagist.org/packages/yiisoft/mailer-swiftmailer)
 [![Total Downloads](https://poser.pugx.org/yiisoft/mailer-swiftmailer/downloads.png)](https://packagist.org/packages/yiisoft/mailer-swiftmailer)
@@ -20,24 +18,61 @@ For license information check the [LICENSE](LICENSE.md)-file.
 [![static analysis](https://github.com/yiisoft/mailer-swiftmailer/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/mailer-swiftmailer/actions?query=workflow%3A%22static+analysis%22)
 [![type-coverage](https://shepherd.dev/github/yiisoft/mailer-swiftmailer/coverage.svg)](https://shepherd.dev/github/yiisoft/mailer-swiftmailer)
 
+This package is a [yiisoft/mailer](https://github.com/yiisoft/mailer) library implementation that provides
+a [Swift Mailer](https://swiftmailer.symfony.com/) mail solution.
 
 ## Installation
 
-The preferred way to install this library is through [composer](http://getcomposer.org/download/).
+The package could be installed with composer:
 
 ```
-php composer.phar require --prefer-dist yiisoft/mailer-swiftmailer
+composer require yiisoft/mailer-swiftmailer
 ```
 
-## Usage
+## General usage
+
+Creating a mailer:
 
 ```php
-$mailer->compose('contact/html')
-    ->setFrom('from@domain.com')
-    ->setTo('to@domain.com')
-    ->setSubject($subject)
+use Yiisoft\Mailer\MessageBodyRenderer;
+use Yiisoft\Mailer\MessageFactory;
+use Yiisoft\Mailer\SwiftMailer\Mailer;
+use Yiisoft\Mailer\SwiftMailer\Message;
+
+/**
+ * @var \Psr\EventDispatcher\EventDispatcherInterface $dispatcher
+ * @var \Swift_Events_EventListener[] $plugins
+ * @var \Swift_Transport $transport
+ * @var \Yiisoft\View\View $view
+ */
+
+$mailer = new Mailer(
+    new MessageFactory(Message::class),
+    new MessageBodyRenderer($view, '/path/to/directory/of/view-files'),
+    $dispatcher,
+    $transport,
+    $plugins, // By default, an empty array
+);
+```
+
+Sending a mail message:
+
+```php
+$mailer->compose()
+    ->withFrom('from@domain.com')
+    ->withTo('to@domain.com')
+    ->withSubject('Message subject')
+    ->withTextBody('Plain text content')
+    ->withHtmlBody('<b>HTML content</b>')
     ->send();
 ```
+
+For use in the [Yii framework](http://www.yiiframework.com/), see the configuration files:
+
+- [`config/common.php`](https://github.com/yiisoft/mailer-swiftmailer/blob/master/config/common.php)
+- [`config/params.php`](https://github.com/yiisoft/mailer-swiftmailer/blob/master/config/params.php)
+
+See [Yii guide to mailing](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/mailing.md) for more info.
 
 ### Unit testing
 
