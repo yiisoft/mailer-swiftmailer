@@ -42,7 +42,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     protected function get(string $id)
     {
-        return $this->container->get($id);
+        return $this->getContainer()->get($id);
     }
 
     /**

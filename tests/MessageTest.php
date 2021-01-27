@@ -13,7 +13,6 @@ use Swift_Mime_SimpleMessage;
 use Swift_Signer;
 use Swift_Signers_DKIMSigner;
 use Swift_Signers_DomainKeySigner;
-use Yiisoft\Mailer\MailerInterface;
 use Yiisoft\Mailer\SwiftMailer\Message;
 
 use function basename;
@@ -51,7 +50,7 @@ final class MessageTest extends TestCase
         $this->assertSame('', $this->message->getTextBody());
         $this->assertSame('', $this->message->getHtmlBody());
         $this->assertSame('', $this->message->getReturnPath());
-        $this->assertSame('', $this->message->getReadReceiptTo());;
+        $this->assertSame('', $this->message->getReadReceiptTo());
         $this->assertSame(Swift_Mime_SimpleMessage::PRIORITY_NORMAL, $this->message->getPriority());
         $this->assertSame([], $this->message->getHeader('header'));
         $this->assertNull($this->message->getError());
@@ -265,17 +264,6 @@ final class MessageTest extends TestCase
         $this->assertSame($body, $message->getHtmlBody());
     }
 
-    public function testMailer(): void
-    {
-        $this->assertNull($this->getInaccessibleProperty($this->message, 'mailer'));
-
-        $mailer = $this->get(MailerInterface::class);
-        $message = $this->message->withMailer($mailer);
-
-        $this->assertNotSame($message, $this->message);
-        $this->assertSame($mailer, $this->getInaccessibleProperty($message, 'mailer'));
-    }
-
     public function testError(): void
     {
         $this->assertNull($this->message->getError());
@@ -285,23 +273,6 @@ final class MessageTest extends TestCase
 
         $this->assertNotSame($message, $this->message);
         $this->assertSame($error, $message->getError());
-    }
-
-    public function testSend(): void
-    {
-        $mailer = $this->get(MailerInterface::class);
-        $message = $this->message->withMailer($mailer)->withSubject('Test subject');
-        $message->send();
-
-        $transport = $this->getInaccessibleProperty($mailer, 'swiftMailer')->getTransport();
-        $this->assertSame([$message->getSwiftMessage()], $transport->sentMessages);
-    }
-
-    public function testSendThrowExceptionForNotSetMailer(): void
-    {
-        $message = $this->message->withSubject('Test subject');
-        $this->expectException(RuntimeException::class);
-        $message->send();
     }
 
     public function testToString(): void

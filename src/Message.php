@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer;
 
-use RuntimeException;
 use Swift_Attachment;
 use Swift_EmbeddedFile;
 use Swift_Message;
 use Swift_Mime_MimePart;
 use Swift_Signer;
 use Throwable;
-use Yiisoft\Mailer\MailerInterface;
 use Yiisoft\Mailer\MessageInterface;
 
 use function reset;
@@ -25,7 +23,6 @@ use function reset;
 final class Message implements MessageInterface
 {
     private Swift_Message $swiftMessage;
-    private ?MailerInterface $mailer = null;
     private ?Throwable $error = null;
 
     public function __construct()
@@ -44,13 +41,6 @@ final class Message implements MessageInterface
     public function getSwiftMessage(): Swift_Message
     {
         return $this->swiftMessage;
-    }
-
-    public function withMailer(MailerInterface $mailer): self
-    {
-        $new = clone $this;
-        $new->mailer = $mailer;
-        return $new;
     }
 
     public function getCharset(): string
@@ -288,17 +278,6 @@ final class Message implements MessageInterface
         $new = clone $this;
         $new->error = $e;
         return $new;
-    }
-
-    public function send(): void
-    {
-        if ($this->mailer === null) {
-            throw new RuntimeException(
-                'Before sending a message, you must set the mailer using the "Message::withMailer()" method.',
-            );
-        }
-
-        $this->mailer->send($this);
     }
 
     public function __toString(): string

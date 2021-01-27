@@ -58,13 +58,16 @@ $mailer = new Mailer(
 Sending a mail message:
 
 ```php
-$mailer->compose()
+$message = $mailer->compose()
     ->withFrom('from@domain.com')
     ->withTo('to@domain.com')
     ->withSubject('Message subject')
     ->withTextBody('Plain text content')
     ->withHtmlBody('<b>HTML content</b>')
-    ->send();
+;
+$mailer->send($message);
+// Or several
+$mailer->sendMultiple([$message]);
 ```
 
 For use in the [Yii framework](http://www.yiiframework.com/), see the configuration files:
