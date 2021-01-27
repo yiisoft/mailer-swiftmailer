@@ -4,42 +4,53 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer;
 
-use Yiisoft\Mailer\BaseMessage;
+use RuntimeException;
+use Swift_Attachment;
+use Swift_EmbeddedFile;
+use Swift_Message;
+use Swift_Mime_MimePart;
+use Swift_Signer;
+use Throwable;
+use Yiisoft\Mailer\MailerInterface;
 use Yiisoft\Mailer\MessageInterface;
+
+use function reset;
 
 /**
  * Message implements a message class based on SwiftMailer.
  *
- * @see http://swiftmailer.org/docs/messages.html
+ * @see https://swiftmailer.symfony.com/docs/messages.html
  * @see Mailer
  */
-class Message extends BaseMessage
+final class Message implements MessageInterface
 {
-    /**
-     * @var \Swift_Message Swift message instance.
-     */
-    private \Swift_Message $swiftMessage;
+    private Swift_Message $swiftMessage;
+    private ?MailerInterface $mailer = null;
+    private ?Throwable $error = null;
+
+    public function __construct()
+    {
+        $this->swiftMessage = new Swift_Message();
+    }
+
+    public function __clone()
+    {
+        $this->swiftMessage = clone $this->swiftMessage;
+    }
 
     /**
-     * @return \Swift_Message Swift message instance.
+     * @return Swift_Message Swift message instance.
      */
-    public function getSwiftMessage(): \Swift_Message
+    public function getSwiftMessage(): Swift_Message
     {
         return $this->swiftMessage;
     }
 
-    public function __construct()
+    public function withMailer(MailerInterface $mailer): self
     {
-        $this->swiftMessage = new \Swift_Message();
-    }
-
-    /**
-     * This method is called after the object is created by cloning an existing one.
-     * It ensures [[swiftMessage]] is also cloned.
-     */
-    public function __clone()
-    {
-        $this->swiftMessage = clone $this->swiftMessage;
+        $new = clone $this;
+        $new->mailer = $mailer;
+        return $new;
     }
 
     public function getCharset(): string
@@ -47,248 +58,185 @@ class Message extends BaseMessage
         return $this->swiftMessage->getCharset();
     }
 
-    public function setCharset(string $charset): MessageInterface
+    public function withCharset(string $charset): self
     {
-        $this->swiftMessage->setCharset($charset);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setCharset($charset);
+        return $new;
     }
 
     public function getFrom()
     {
-        return $this->swiftMessage->getFrom();
+        return $this->swiftMessage->getFrom() ?? '';
     }
 
-    public function setFrom($from): MessageInterface
+    public function withFrom($from): self
     {
-        $this->swiftMessage->setFrom($from);
-
-        return $this;
-    }
-
-    public function getReplyTo()
-    {
-        return $this->swiftMessage->getReplyTo();
-    }
-
-    public function setReplyTo($replyTo): MessageInterface
-    {
-        $this->swiftMessage->setReplyTo($replyTo);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setFrom($from);
+        return $new;
     }
 
     public function getTo()
     {
-        return $this->swiftMessage->getTo();
+        return $this->swiftMessage->getTo() ?? '';
     }
 
-    public function setTo($to): MessageInterface
+    public function withTo($to): self
     {
-        $this->swiftMessage->setTo($to);
+        $new = clone $this;
+        $new->swiftMessage->setTo($to);
+        return $new;
+    }
 
-        return $this;
+    public function getReplyTo()
+    {
+        return $this->swiftMessage->getReplyTo() ?? '';
+    }
+
+    public function withReplyTo($replyTo): self
+    {
+        $new = clone $this;
+        $new->swiftMessage->setReplyTo($replyTo);
+        return $new;
     }
 
     public function getCc()
     {
-        return $this->swiftMessage->getCc();
+        return $this->swiftMessage->getCc() ?? '';
     }
 
-    public function setCc($cc): MessageInterface
+    public function withCc($cc): self
     {
-        $this->swiftMessage->setCc($cc);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setCc($cc);
+        return $new;
     }
 
     public function getBcc()
     {
-        return $this->swiftMessage->getBcc();
+        return $this->swiftMessage->getBcc() ?? '';
     }
 
-    public function setBcc($bcc): MessageInterface
+    public function withBcc($bcc): self
     {
-        $this->swiftMessage->setBcc($bcc);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setBcc($bcc);
+        return $new;
     }
 
     public function getSubject(): string
     {
-        return $this->swiftMessage->getSubject();
+        return (string) $this->swiftMessage->getSubject() ?? '';
     }
 
-    public function setSubject(string $subject): MessageInterface
+    public function withSubject(string $subject): self
     {
-        $this->swiftMessage->setSubject($subject);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setSubject($subject);
+        return $new;
     }
 
     public function getTextBody(): string
     {
-        return $this->swiftMessage->getBody();
+        return $this->swiftMessage->getBody() ?? '';
     }
 
-    public function setTextBody(string $text): MessageInterface
+    public function withTextBody(string $text): self
     {
-        $this->setBody($text, 'text/plain');
-
-        return $this;
+        $new = clone $this;
+        $new->setBody($text, 'text/plain');
+        return $new;
     }
 
     public function getHtmlBody(): string
     {
-        return $this->swiftMessage->getBody();
+        return $this->swiftMessage->getBody() ?? '';
     }
 
-    public function setHtmlBody(string $html): MessageInterface
+    public function withHtmlBody(string $html): self
     {
-        $this->setBody($html, 'text/html');
-
-        return $this;
+        $new = clone $this;
+        $new->setBody($html, 'text/html');
+        return $new;
     }
 
-    /**
-     * Sets the message body.
-     * If body is already set and its content type matches given one, it will
-     * be overridden, if content type miss match the multipart message will be composed.
-     *
-     * @param string $body        body content.
-     * @param string $contentType body content type.
-     */
-    protected function setBody(string $body, string $contentType): void
+    public function withAttached(string $fileName, array $options = []): self
     {
-        $message = $this->swiftMessage;
-        $oldBody = $message->getBody();
-        $charset = $message->getCharset();
-        if (empty($oldBody)) {
-            $parts = $message->getChildren();
-            $partFound = false;
-            foreach ($parts as $key => $part) {
-                if (!($part instanceof \Swift_Mime_Attachment)) {
-                    /**
-                     * @var \Swift_Mime_MimePart $part
-                     * @psalm-suppress UndefinedMethod
-                     */
-                    if ($part->getContentType() == $contentType) {
-                        $charset = $part->getCharset();
-                        unset($parts[$key]);
-                        $partFound = true;
-                        break;
-                    }
-                }
-            }
-            if ($partFound) {
-                reset($parts);
-                $message->setChildren($parts);
-                $message->addPart($body, $contentType, $charset);
-            } else {
-                $message->setBody($body, $contentType);
-            }
-        } else {
-            $oldContentType = $message->getContentType();
-            if ($oldContentType == $contentType) {
-                $message->setBody($body, $contentType);
-            } else {
-                $message->setBody(null);
-                $message->setContentType('');
-                $message->addPart($oldBody, $oldContentType, $charset);
-                $message->addPart($body, $contentType, $charset);
-            }
-        }
-    }
+        $attachment = Swift_Attachment::fromPath($fileName);
 
-    public function attach(string $fileName, array $options = []): MessageInterface
-    {
-        $attachment = \Swift_Attachment::fromPath($fileName);
         if (!empty($options['fileName'])) {
             $attachment->setFilename($options['fileName']);
         }
+
         if (!empty($options['contentType'])) {
             $attachment->setContentType($options['contentType']);
         }
-        $this->swiftMessage->attach($attachment);
 
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->attach($attachment);
+        return $new;
     }
 
-    public function attachContent(string $content, array $options = []): MessageInterface
+    public function withAttachedContent(string $content, array $options = []): self
     {
-        $attachment = new \Swift_Attachment($content);
+        $attachment = new Swift_Attachment($content);
+
         if (!empty($options['fileName'])) {
             $attachment->setFilename($options['fileName']);
         }
+
         if (!empty($options['contentType'])) {
             $attachment->setContentType($options['contentType']);
         }
-        $this->swiftMessage->attach($attachment);
 
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->attach($attachment);
+        return $new;
     }
 
     public function embed(string $fileName, array $options = []): string
     {
-        $embedFile = \Swift_EmbeddedFile::fromPath($fileName);
+        $embedFile = Swift_EmbeddedFile::fromPath($fileName);
+
         if (!empty($options['fileName'])) {
             $embedFile->setFilename($options['fileName']);
         }
+
         if (!empty($options['contentType'])) {
             $embedFile->setContentType($options['contentType']);
         }
 
+        $this->swiftMessage = clone $this->swiftMessage;
         return $this->swiftMessage->embed($embedFile);
     }
 
     public function embedContent(string $content, array $options = []): string
     {
-        $embedFile = new \Swift_EmbeddedFile($content);
+        $embedFile = new Swift_EmbeddedFile($content);
+
         if (!empty($options['fileName'])) {
             $embedFile->setFilename($options['fileName']);
         }
+
         if (!empty($options['contentType'])) {
             $embedFile->setContentType($options['contentType']);
         }
 
+        $this->swiftMessage = clone $this->swiftMessage;
         return $this->swiftMessage->embed($embedFile);
-    }
-
-    public function toString(): string
-    {
-        return $this->swiftMessage->toString();
-    }
-
-    public function addHeader(string $name, string $value): MessageInterface
-    {
-        $this->swiftMessage->getHeaders()->addTextHeader($name, $value);
-
-        return $this;
-    }
-
-    public function setHeader(string $name, $value): MessageInterface
-    {
-        $headerSet = $this->swiftMessage->getHeaders();
-
-        if ($headerSet->has($name)) {
-            $headerSet->remove($name);
-        }
-
-        foreach ((array)$value as $v) {
-            $headerSet->addTextHeader($name, $v);
-        }
-
-        return $this;
     }
 
     public function getHeader(string $name): array
     {
         $headerSet = $this->swiftMessage->getHeaders();
+
         if (!$headerSet->has($name)) {
             return [];
         }
 
         $headers = [];
+
         foreach ($headerSet->getAll($name) as $header) {
             $headers[] = $header->getValue();
         }
@@ -296,103 +244,210 @@ class Message extends BaseMessage
         return $headers;
     }
 
-    public function setHeaders(array $headers): MessageInterface
+    public function withAddedHeader(string $name, string $value): self
     {
-        foreach ($headers as $name => $value) {
-            $this->setHeader($name, $value);
+        $new = clone $this;
+        $new->swiftMessage->getHeaders()->addTextHeader($name, $value);
+        return $new;
+    }
+
+    public function withHeader(string $name, $value): self
+    {
+        $new = clone $this;
+        $headerSet = $new->swiftMessage->getHeaders();
+
+        if ($headerSet->has($name)) {
+            $headerSet->remove($name);
         }
 
-        return $this;
+        foreach ((array) $value as $v) {
+            $headerSet->addTextHeader($name, $v);
+        }
+
+        return $new;
+    }
+
+    public function withHeaders(array $headers): self
+    {
+        $new = clone $this;
+
+        foreach ($headers as $name => $value) {
+            $new = $new->withHeader($name, $value);
+        }
+
+        return $new;
+    }
+
+    public function getError(): ?Throwable
+    {
+        return $this->error;
+    }
+
+    public function withError(Throwable $e): self
+    {
+        $new = clone $this;
+        $new->error = $e;
+        return $new;
+    }
+
+    public function send(): void
+    {
+        if ($this->mailer === null) {
+            throw new RuntimeException(
+                'Before sending a message, you must set the mailer using the "Message::withMailer()" method.',
+            );
+        }
+
+        $this->mailer->send($this);
+    }
+
+    public function __toString(): string
+    {
+        return $this->swiftMessage->toString();
     }
 
     /**
      * Returns the return-path (the bounce address) of this message.
      *
-     * @return string the bounce email address.
+     * @return string The bounce email address.
      */
     public function getReturnPath(): string
     {
-        return $this->swiftMessage->getReturnPath();
+        return $this->swiftMessage->getReturnPath() ?? '';
     }
 
     /**
      * Set the return-path (the bounce address) of this message.
      *
-     * @param string $address the bounce email address.
+     * @param string $address The bounce email address.
      *
-     * @return $this self reference.
+     * @return self
      */
-    public function setReturnPath(string $address): MessageInterface
+    public function withReturnPath(string $address): self
     {
-        $this->swiftMessage->setReturnPath($address);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setReturnPath($address);
+        return $new;
     }
 
     /**
      * Returns the priority of this message.
      *
-     * @return int priority value as integer in range: `1..5`,
+     * @return int The priority value as integer in range: `1..5`,
      * where 1 is the highest priority and 5 is the lowest.
      */
     public function getPriority(): int
     {
-        /** @psalm-suppress RedundantCastGivenDocblockType */
-        return (int)$this->swiftMessage->getPriority();
+        return (int) $this->swiftMessage->getPriority();
     }
 
     /**
      * Set the priority of this message.
      *
-     * @param int $priority priority value, should be an integer in range: `1..5`,
+     * @param int $priority The priority value, should be an integer in range: `1..5`,
      * where 1 is the highest priority and 5 is the lowest.
      *
-     * @return $this self reference.
+     * @return self
      */
-    public function setPriority(int $priority): MessageInterface
+    public function withPriority(int $priority): self
     {
-        $this->swiftMessage->setPriority($priority);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setPriority($priority);
+        return $new;
     }
 
     /**
      * Get the addresses to which a read-receipt will be sent.
      *
-     * @return array|string receipt receive email addresses.
+     * @return array|string The receipt receive email addresses.
      */
     public function getReadReceiptTo()
     {
-        return $this->swiftMessage->getReadReceiptTo();
+        return $this->swiftMessage->getReadReceiptTo() ?? '';
     }
 
     /**
      * Sets the ask for a delivery receipt from the recipient to be sent to $addresses.
      *
-     * @param array $addresses receipt receive email address(es).
+     * @param array|string $addresses The receipt receive email address(es).
      *
-     * @return $this self reference.
+     * @return self
      */
-    public function setReadReceiptTo($addresses): MessageInterface
+    public function withReadReceiptTo($addresses): self
     {
-        $this->swiftMessage->setReadReceiptTo($addresses);
-
-        return $this;
+        $new = clone $this;
+        $new->swiftMessage->setReadReceiptTo((array) $addresses);
+        return $new;
     }
 
     /**
      * Attaches signers.
      *
-     * @param \Swift_Signer[] $signers
+     * @param Swift_Signer[] $signers
      *
      * @return self
      */
-    public function attachSigners(array $signers): self
+    public function withAttachedSigners(array $signers): self
     {
+        $new = clone $this;
+
         foreach ($signers as $signer) {
-            $this->swiftMessage->attachSigner($signer);
+            $new->swiftMessage->attachSigner($signer);
         }
 
-        return $this;
+        return $new;
+    }
+
+    /**
+     * Sets the message body.
+     *
+     * If body is already set and its content type matches given one, it will
+     * be overridden, if content type miss match the multipart message will be composed.
+     *
+     * @param string $body The body content.
+     * @param string $contentType The body content type.
+     */
+    private function setBody(string $body, string $contentType): void
+    {
+        $oldBody = $this->swiftMessage->getBody();
+        $charset = $this->swiftMessage->getCharset();
+
+        if (!empty($oldBody)) {
+            $oldContentType = $this->swiftMessage->getContentType();
+
+            if ($oldContentType === $contentType) {
+                $this->swiftMessage->setBody($body, $contentType);
+                return;
+            }
+
+            $this->swiftMessage->setBody(null);
+            $this->swiftMessage->setContentType('');
+            $this->swiftMessage->addPart($oldBody, $oldContentType, $charset);
+            $this->swiftMessage->addPart($body, $contentType, $charset);
+            return;
+        }
+
+        $parts = $this->swiftMessage->getChildren();
+        $partFound = false;
+
+        foreach ($parts as $key => $part) {
+            if ($part instanceof Swift_Mime_MimePart) {
+                if ($part->getContentType() === $contentType) {
+                    $charset = $part->getCharset();
+                    unset($parts[$key]);
+                    $partFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$partFound) {
+            $this->swiftMessage->setBody($body, $contentType);
+            return;
+        }
+
+        reset($parts);
+        $this->swiftMessage->setChildren($parts);
+        $this->swiftMessage->addPart($body, $contentType, $charset);
     }
 }
