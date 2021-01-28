@@ -70,6 +70,17 @@ $mailer->send($message);
 $mailer->sendMultiple([$message]);
 ```
 
+Additional methods of the `Yiisoft\Mailer\SwiftMailer\Message`:
+
+- `getSwiftMessage()` - Returns a Swift message instance.
+- `getReturnPath()` - Returns the return-path (the bounce address) of this message.
+- `withReturnPath()` - Returns a new instance with the specified return-path (the bounce address) of this message.
+- `getPriority()` - Returns the priority of this message.
+- `withPriority()` - Returns a new instance with the specified priority of this message.
+- `getReadReceiptTo()` - Returns the addresses to which a read-receipt will be sent.
+- `withReadReceiptTo()` - Returns a new instance with the specified ask for a delivery receipt from the recipient to be sent to address.
+- `withAttachedSigners()` - Returns a new instance with the specified attached signers.
+
 For use in the [Yii framework](http://www.yiiframework.com/), see the configuration files:
 
 - [`config/common.php`](https://github.com/yiisoft/mailer-swiftmailer/blob/master/config/common.php)

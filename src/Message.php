@@ -35,14 +35,6 @@ final class Message implements MessageInterface
         $this->swiftMessage = clone $this->swiftMessage;
     }
 
-    /**
-     * @return Swift_Message Swift message instance.
-     */
-    public function getSwiftMessage(): Swift_Message
-    {
-        return $this->swiftMessage;
-    }
-
     public function getCharset(): string
     {
         return $this->swiftMessage->getCharset();
@@ -286,6 +278,16 @@ final class Message implements MessageInterface
     }
 
     /**
+     * Returns a Swift message instance.
+     *
+     * @return Swift_Message Swift message instance.
+     */
+    public function getSwiftMessage(): Swift_Message
+    {
+        return $this->swiftMessage;
+    }
+
+    /**
      * Returns the return-path (the bounce address) of this message.
      *
      * @return string The bounce email address.
@@ -296,7 +298,7 @@ final class Message implements MessageInterface
     }
 
     /**
-     * Set the return-path (the bounce address) of this message.
+     * Returns a new instance with the specified return-path (the bounce address) of this message.
      *
      * @param string $address The bounce email address.
      *
@@ -321,7 +323,7 @@ final class Message implements MessageInterface
     }
 
     /**
-     * Set the priority of this message.
+     * Returns a new instance with the specified priority of this message.
      *
      * @param int $priority The priority value, should be an integer in range: `1..5`,
      * where 1 is the highest priority and 5 is the lowest.
@@ -336,7 +338,7 @@ final class Message implements MessageInterface
     }
 
     /**
-     * Get the addresses to which a read-receipt will be sent.
+     * Returns the addresses to which a read-receipt will be sent.
      *
      * @return array|string The receipt receive email addresses.
      */
@@ -346,7 +348,7 @@ final class Message implements MessageInterface
     }
 
     /**
-     * Sets the ask for a delivery receipt from the recipient to be sent to $addresses.
+     * Returns a new instance with the specified ask for a delivery receipt from the recipient to be sent to addresses.
      *
      * @param array|string $addresses The receipt receive email address(es).
      *
@@ -360,7 +362,7 @@ final class Message implements MessageInterface
     }
 
     /**
-     * Attaches signers.
+     * Returns a new instance with the specified attached signers.
      *
      * @param Swift_Signer[] $signers
      *
