@@ -10,6 +10,7 @@ use Swift_Message;
 use Swift_Mime_MimePart;
 use Swift_Signer;
 use Throwable;
+use Yiisoft\Mailer\File;
 use Yiisoft\Mailer\MessageInterface;
 
 use function reset;
@@ -143,16 +144,19 @@ final class Message implements MessageInterface
         return $new;
     }
 
-    public function withAttached(string $fileName, array $options = []): self
+    public function withAttached(File $file): self
     {
-        $attachment = Swift_Attachment::fromPath($fileName);
+        $attachment = $file->path() === null
+            ? new Swift_Attachment($file->content())
+            : Swift_Attachment::fromPath($file->path())
+        ;
 
-        if (!empty($options['fileName'])) {
-            $attachment->setFilename($options['fileName']);
+        if (!empty($file->name())) {
+            $attachment->setFilename($file->name());
         }
 
-        if (!empty($options['contentType'])) {
-            $attachment->setContentType($options['contentType']);
+        if (!empty($file->contentType())) {
+            $attachment->setContentType($file->contentType());
         }
 
         $new = clone $this;
@@ -160,53 +164,24 @@ final class Message implements MessageInterface
         return $new;
     }
 
-    public function withAttachedContent(string $content, array $options = []): self
+    public function withEmbedded(File $file): self
     {
-        $attachment = new Swift_Attachment($content);
+        $embedFile = $file->path() === null
+            ? new Swift_EmbeddedFile($file->content())
+            : Swift_EmbeddedFile::fromPath($file->path())
+        ;
 
-        if (!empty($options['fileName'])) {
-            $attachment->setFilename($options['fileName']);
+        if (!empty($file->name())) {
+            $embedFile->setFilename($file->name());
         }
 
-        if (!empty($options['contentType'])) {
-            $attachment->setContentType($options['contentType']);
+        if (!empty($file->contentType())) {
+            $embedFile->setContentType($file->contentType());
         }
 
         $new = clone $this;
-        $new->swiftMessage->attach($attachment);
+        $new->swiftMessage->embed($embedFile->setId($file->id()));
         return $new;
-    }
-
-    public function embed(string $fileName, array $options = []): string
-    {
-        $embedFile = Swift_EmbeddedFile::fromPath($fileName);
-
-        if (!empty($options['fileName'])) {
-            $embedFile->setFilename($options['fileName']);
-        }
-
-        if (!empty($options['contentType'])) {
-            $embedFile->setContentType($options['contentType']);
-        }
-
-        $this->swiftMessage = clone $this->swiftMessage;
-        return $this->swiftMessage->embed($embedFile);
-    }
-
-    public function embedContent(string $content, array $options = []): string
-    {
-        $embedFile = new Swift_EmbeddedFile($content);
-
-        if (!empty($options['fileName'])) {
-            $embedFile->setFilename($options['fileName']);
-        }
-
-        if (!empty($options['contentType'])) {
-            $embedFile->setContentType($options['contentType']);
-        }
-
-        $this->swiftMessage = clone $this->swiftMessage;
-        return $this->swiftMessage->embed($embedFile);
     }
 
     public function getHeader(string $name): array

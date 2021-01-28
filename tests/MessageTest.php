@@ -13,6 +13,7 @@ use Swift_Mime_SimpleMessage;
 use Swift_Signer;
 use Swift_Signers_DKIMSigner;
 use Swift_Signers_DomainKeySigner;
+use Yiisoft\Mailer\File;
 use Yiisoft\Mailer\SwiftMailer\Message;
 
 use function basename;
@@ -428,86 +429,80 @@ final class MessageTest extends TestCase
 
     public function testAttachFile(): void
     {
-        $fileName = __FILE__;
-        $options = ['fileName' => $fileName, 'contentType' => 'application/x-php'];
+        $file = File::fromPath(__FILE__, 'test.php', 'application/x-php');
 
-        $attachment = $this->getAttachment(
-            $this->message
-                ->withTo('to@example.com')
-                ->withFrom('someuser@somedomain.com')
-                ->withSubject('Yii Swift Attach File Test')
-                ->withHtmlBody('Yii Swift Attach File Test body')
-                ->withAttached($fileName, $options)
-        );
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Attach File Test')
+            ->withTextBody('Yii Swift Attach File Test body')
+            ->withAttached($file)
+        ;
+        $attachment = $this->getAttachment($message);
 
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertStringContainsString($attachment->getFilename(), $options['fileName'], 'Invalid file name!');
-        $this->assertSame($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($attachment->getFilename(), $file->name(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
     public function testAttachContent(): void
     {
-        $fileContent = 'Test attachment content';
-        $options = ['fileName' => 'test.txt', 'contentType' => 'text/plain'];
+        $file = File::fromContent('Test attachment content', 'test.txt', 'text/plain');
 
-        $attachment = $this->getAttachment(
-            $this->message
-                ->withTo('to@example.com')
-                ->withFrom('someuser@somedomain.com')
-                ->withSubject('Yii Swift Attach Content Test')
-                ->withHtmlBody('Yii Swift Attach Content Test body')
-                ->withAttachedContent($fileContent, $options)
-        );
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Attach Content Test')
+            ->withTextBody('Yii Swift Attach Content Test body')
+            ->withAttached($file)
+        ;
+        $attachment = $this->getAttachment($message);
 
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertSame($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
-        $this->assertSame($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($attachment->getFilename(), $file->name(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
     public function testEmbedFile(): void
     {
-        $fileName = $this->createImageFile('embed_file.jpg', 'Embed Image File');
-        $options = ['fileName' => $fileName, 'contentType' => 'image/jpeg'];
-        $swiftMessage = $this->message->getSwiftMessage();
-        $cid = $this->message->embed($fileName, $options);
-        $this->assertNotSame($this->message->getSwiftMessage(), $swiftMessage);
+        $path = $this->createImageFile('embed-file.jpg', 'Embed Image File');
+        $file = File::fromPath($path, basename($path), 'image/jpeg');
 
-        $attachment = $this->getAttachment(
-            $this->message
-                ->withTo('to@example.com')
-                ->withFrom('someuser@somedomain.com')
-                ->withSubject('Yii Swift Embed File Test')
-                ->withHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">')
-        );
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Embed File Test')
+            ->withHtmlBody('Embed image: <img src="' . $file->cid() . '" alt="pic">')
+            ->withEmbedded($file)
+        ;
+        $attachment = $this->getAttachment($message);
 
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertStringContainsString($attachment->getFilename(), $fileName, 'Invalid file name!');
-        $this->assertSame($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
-        $this->assertSame($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($attachment->getFilename(), $file->name(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
     public function testEmbedContent(): void
     {
-        $fileFullName = $this->createImageFile('embed_file.jpg', 'Embed Image File');
+        $path = $this->createImageFile('embed-file.jpg', 'Embed Image File');
+        $file = File::fromContent(file_get_contents($path), basename($path), 'image/jpeg');
 
-        $fileName = basename($fileFullName);
-        $contentType = 'image/jpeg';
-        $fileContent = file_get_contents($fileFullName);
-        $swiftMessage = $this->message->getSwiftMessage();
-        $cid = $this->message->embedContent($fileContent, ['fileName' => $fileName, 'contentType' => $contentType]);
-        $this->assertNotSame($this->message->getSwiftMessage(), $swiftMessage);
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Embed Content Test')
+            ->withHtmlBody('Embed image: <img src="' . $file->cid() . '" alt="pic">')
+            ->withEmbedded($file)
+        ;
+        $attachment = $this->getAttachment($message);
 
-        $attachment = $this->getAttachment(
-            $this->message
-                ->withTo('to@example.com')
-                ->withFrom('someuser@somedomain.com')
-                ->withSubject('Yii Swift Embed Content Test')
-                ->withHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">')
-        );
-
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertSame($fileName, $attachment->getFilename(), 'Invalid file name!');
-        $this->assertSame($contentType, $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($file->name(), $attachment->getFilename(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
     private function getAttachment(Message $message): ?Swift_Mime_Attachment
