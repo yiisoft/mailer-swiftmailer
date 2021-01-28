@@ -106,7 +106,7 @@ final class MessageTest extends TestCase
     /**
      * @dataProvider addressesDataProvider
      *
-     * @param string|array $from
+     * @param array|string $from
      * @param array $expected
      */
     public function testFrom($from, array $expected): void
@@ -119,7 +119,7 @@ final class MessageTest extends TestCase
     /**
      * @dataProvider addressesDataProvider
      *
-     * @param string|array $to
+     * @param array|string $to
      * @param array $expected
      */
     public function testTo($to, array $expected): void
@@ -132,7 +132,7 @@ final class MessageTest extends TestCase
     /**
      * @dataProvider addressesDataProvider
      *
-     * @param string|array $replyTo
+     * @param array|string $replyTo
      * @param array $expected
      */
     public function testReplyTo($replyTo, array $expected): void
@@ -145,7 +145,7 @@ final class MessageTest extends TestCase
     /**
      * @dataProvider addressesDataProvider
      *
-     * @param string|array $cc
+     * @param array|string $cc
      * @param array $expected
      */
     public function testCc($cc, array $expected): void
@@ -158,7 +158,7 @@ final class MessageTest extends TestCase
     /**
      * @dataProvider addressesDataProvider
      *
-     * @param string|array $bcc
+     * @param array|string $bcc
      * @param array $expected
      */
     public function testBcc($bcc, array $expected): void
@@ -171,7 +171,7 @@ final class MessageTest extends TestCase
     /**
      * @dataProvider addressesDataProvider
      *
-     * @param string|array $readReceiptTo
+     * @param array|string $readReceiptTo
      * @param array $expected
      */
     public function testReadReceiptTo($readReceiptTo, array $expected): void
