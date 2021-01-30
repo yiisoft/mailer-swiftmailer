@@ -12,8 +12,8 @@ build:
                 php: 7.4.12
 
             dependencies:
-                override:
-                    - pecl install gd
+                before:
+                    - apt-get install -y php7.4-gd
 
             tests:
                 override:
@@ -26,7 +26,7 @@ build:
             dependencies:
                 override:
                     - composer self-update
-                    - pecl install gd
+                    - apt-get install -y php7.4-gd
                     - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
             tests:
