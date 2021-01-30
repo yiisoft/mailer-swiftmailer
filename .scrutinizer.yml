@@ -6,38 +6,21 @@ filter:
         - "src/*"
 
 build:
+    environment:
+        php:
+            version: 7.4.14
+            compile_options: '--with-config-file-path=/home/scrutinizer/.phpenv/versions/7.4.14/etc --with-config-file-scan-dir=/home/scrutinizer/.phpenv/versions/7.4.14/etc/conf.d --prefix=/home/scrutinizer/.phpenv/versions/7.4.14 --libexecdir=/home/scrutinizer/.phpenv/versions/7.4.14/libexec --enable-intl --with-openssl --without-pear --with-gd --enable-gd --with-jpeg-dir=/usr --with-png-dir=/usr --with-freetype-dir=/usr --enable-exif --with-libzip --with-zlib --with-zlib-dir=/usr --with-sodium --with-pdo-sqlite --enable-soap --enable-xmlreader --with-xsl --enable-ftp --with-tidy --with-xmlrpc --enable-sysvsem --enable-sysvshm --enable-sysvmsg --enable-shmop --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-pcntl --with-readline --enable-mbstring --with-curl --with-pgsql --with-pdo-pgsql --with-gettext --enable-sockets --with-bz2 --enable-bcmath --enable-calendar --with-libdir=lib --enable-fpm --enable-maintainer-zts --with-gmp --with-kerberos --with-imap --with-imap-ssl --with-apxs2=/usr/bin/apxs --with-ldap --with-pear=/home/scrutinizer/.phpenv/versions/7.4.14/pear'
     nodes:
         analysis:
-            environment:
-                php:
-                    version: 7.4.4
-                    compile_options: '--with-config-file-path=/home/scrutinizer/.phpenv/versions/7.4.4/etc --with-config-file-scan-dir=/home/scrutinizer/.phpenv/versions/7.4.4/etc/conf.d --prefix=/home/scrutinizer/.phpenv/versions/7.4.4 --libexecdir=/home/scrutinizer/.phpenv/versions/7.4.4/libexec --enable-intl --with-openssl --without-pear --with-gd --enable-gd --with-jpeg-dir=/usr --with-png-dir=/usr --with-freetype-dir=/usr --enable-exif --with-libzip --with-zlib --with-zlib-dir=/usr --with-sodium --with-pdo-sqlite --enable-soap --enable-xmlreader --with-xsl --enable-ftp --with-tidy --with-xmlrpc --enable-sysvsem --enable-sysvshm --enable-sysvmsg --enable-shmop --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-pcntl --with-readline --enable-mbstring --with-curl --with-pgsql --with-pdo-pgsql --with-gettext --enable-sockets --with-bz2 --enable-bcmath --enable-calendar --with-libdir=lib --enable-fpm --enable-maintainer-zts --with-gmp --with-kerberos --with-imap --with-imap-ssl --with-apxs2=/usr/bin/apxs --with-ldap --with-pear=/home/scrutinizer/.phpenv/versions/7.4.4/pear'
-
-            dependencies:
-                before:
-                    - sudo add-apt-repository ppa:ondrej/php
-                    - sudo apt update
-                    - sudo apt-get install php7.4-gd
-
             tests:
                 override:
                     - php-scrutinizer-run
 
         tests-and-coverage:
-            environment:
-                php: 7.4.12
-
             dependencies:
-                before:
-                    - sudo add-apt-repository ppa:ondrej/php
-                    - sudo apt update
-                    - sudo apt-get install php7.4-gd
-
                 override:
                     - composer self-update
-                    - sudo apt-get install -y php-gd
                     - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
-
             tests:
                 override:
                     -
