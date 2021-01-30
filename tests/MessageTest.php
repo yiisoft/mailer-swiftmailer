@@ -4,68 +4,85 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
+use Exception;
+use RuntimeException;
+use Swift_Message;
+use Swift_Mime_Attachment;
+use Swift_Mime_MimePart;
+use Swift_Mime_SimpleMessage;
+use Swift_Signer;
+use Swift_Signers_DKIMSigner;
+use Swift_Signers_DomainKeySigner;
+use Yiisoft\Mailer\File;
 use Yiisoft\Mailer\SwiftMailer\Message;
 
-class MessageTest extends TestCase
+use function basename;
+use function file_get_contents;
+use function function_exists;
+use function getmypid;
+use function is_dir;
+use function mkdir;
+use function serialize;
+use function str_replace;
+use function substr_count;
+use function sys_get_temp_dir;
+use function unserialize;
+
+final class MessageTest extends TestCase
 {
-    private function createMessage(): Message
+    private Message $message;
+
+    public function setUp(): void
     {
-        return new Message();
+        parent::setUp();
+        $this->message = new Message();
     }
 
-    public function testSetUp(): void
+    public function testDefaultGetters(): void
     {
-        $message = $this->createMessage();
-        $this->assertInstanceOf(\Swift_Message::class, $message->getSwiftMessage());
+        $this->assertInstanceOf(Swift_Message::class, $this->message->getSwiftMessage());
+        $this->assertSame('utf-8', $this->message->getCharset());
+        $this->assertSame([], $this->message->getFrom());
+        $this->assertSame('', $this->message->getTo());
+        $this->assertSame('', $this->message->getReplyTo());
+        $this->assertSame('', $this->message->getCc());
+        $this->assertSame('', $this->message->getBcc());
+        $this->assertSame('', $this->message->getSubject());
+        $this->assertSame('', $this->message->getTextBody());
+        $this->assertSame('', $this->message->getHtmlBody());
+        $this->assertSame('', $this->message->getReturnPath());
+        $this->assertSame('', $this->message->getReadReceiptTo());
+        $this->assertSame(Swift_Mime_SimpleMessage::PRIORITY_NORMAL, $this->message->getPriority());
+        $this->assertSame([], $this->message->getHeader('header'));
+        $this->assertNull($this->message->getError());
     }
 
-    /**
-     * @dataProvider dataProviderSubjects
-     */
-    public function testSubject(string $subject): void
+    public function testSubject(): void
     {
-        $message = $this->createMessage()
-            ->setSubject($subject);
+        $subject = 'Test subject';
+        $message = $this->message->withSubject($subject);
+        $this->assertNotSame($message, $this->message);
         $this->assertSame($subject, $message->getSubject());
     }
 
-    public function dataProviderSubjects(): array
+    public function charsetDataProvider(): array
     {
-        return [
-            ['foo'],
-            ['bar'],
-        ];
+        return [['utf-8'], ['iso-8859-2']];
     }
 
     /**
-     * @dataProvider dataProviderCharsets
+     * @dataProvider charsetDataProvider
+     *
+     * @param string $charset
      */
     public function testCharset(string $charset): void
     {
-        $message = $this->createMessage()
-            ->setCharset($charset);
+        $message = $this->message->withCharset($charset);
+        $this->assertNotSame($message, $this->message);
         $this->assertSame($charset, $message->getCharset());
     }
 
-    public function dataProviderCharsets(): array
-    {
-        return [
-            ['utf-8'],
-            ['iso-8859-2'],
-        ];
-    }
-
-    /**
-     * @dataProvider dataProviderFrom
-     */
-    public function testFrom($from, $expected): void
-    {
-        $message = $this->createMessage()
-            ->setFrom($from);
-        $this->assertEquals($expected, $message->getFrom());
-    }
-
-    public function dataProviderFrom(): array
+    public function addressesDataProvider(): array
     {
         return [
             [
@@ -88,138 +105,115 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderRecipients
+     * @dataProvider addressesDataProvider
+     *
+     * @param array|string $from
+     * @param array $expected
      */
-    public function testTo($to, $expected): void
+    public function testFrom($from, array $expected): void
     {
-        $message = $this->createMessage()
-            ->setTo($to);
-        $this->assertEquals($expected, $message->getTo());
+        $message = $this->message->withFrom($from);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getFrom());
     }
 
     /**
-     * @dataProvider dataProviderRecipients
+     * @dataProvider addressesDataProvider
+     *
+     * @param array|string $to
+     * @param array $expected
      */
-    public function testCc($cc, $expected): void
+    public function testTo($to, array $expected): void
     {
-        $message = $this->createMessage()
-            ->setCc($cc);
-        $this->assertEquals($expected, $message->getCc());
+        $message = $this->message->withTo($to);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getTo());
     }
 
     /**
-     * @dataProvider dataProviderRecipients
+     * @dataProvider addressesDataProvider
+     *
+     * @param array|string $replyTo
+     * @param array $expected
      */
-    public function testBcc($bcc, $expected): void
+    public function testReplyTo($replyTo, array $expected): void
     {
-        $message = $this->createMessage()
-            ->setBcc($bcc);
-        $this->assertEquals($expected, $message->getBcc());
+        $message = $this->message->withReplyTo($replyTo);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getReplyTo());
     }
 
     /**
-     * @dataProvider dataProviderRecipients
+     * @dataProvider addressesDataProvider
+     *
+     * @param array|string $cc
+     * @param array $expected
      */
-    public function testReplyTo($to, $expected): void
+    public function testCc($cc, array $expected): void
     {
-        $message = $this->createMessage()
-            ->setReplyTo($to);
-        $this->assertEquals($expected, $message->getReplyTo());
+        $message = $this->message->withCc($cc);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getCc());
     }
 
     /**
-     * @dataProvider dataProviderReadReceiptTo
+     * @dataProvider addressesDataProvider
+     *
+     * @param array|string $bcc
+     * @param array $expected
      */
-    public function testReadReceiptTo($to, $expected): void
+    public function testBcc($bcc, array $expected): void
     {
-        $message = $this->createMessage()
-            ->setReadReceiptTo($to);
-        $this->assertEquals($expected, $message->getReadReceiptTo());
+        $message = $this->message->withBcc($bcc);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getBcc());
     }
 
-    public function dataProviderRecipients(): array
+    /**
+     * @dataProvider addressesDataProvider
+     *
+     * @param array|string $readReceiptTo
+     * @param array $expected
+     */
+    public function testReadReceiptTo($readReceiptTo, array $expected): void
+    {
+        $message = $this->message->withReadReceiptTo($readReceiptTo);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getReadReceiptTo());
+    }
+
+    public function priorityDataProvider(): array
     {
         return [
-            [
-                'foo@example.com',
-                ['foo@example.com' => null],
-            ],
-            [
-                ['foo@example.com', 'bar@example.com'],
-                ['foo@example.com' => null, 'bar@example.com' => null],
-            ],
-            [
-                ['foo@example.com' => 'foo'],
-                ['foo@example.com' => 'foo'],
-            ],
-            [
-                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
-                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
-            ],
+            [Swift_Mime_SimpleMessage::PRIORITY_HIGHEST],
+            [Swift_Mime_SimpleMessage::PRIORITY_HIGH],
+            [Swift_Mime_SimpleMessage::PRIORITY_NORMAL],
+            [Swift_Mime_SimpleMessage::PRIORITY_LOW],
+            [Swift_Mime_SimpleMessage::PRIORITY_LOWEST],
         ];
     }
 
-    public function dataProviderReadReceiptTo(): array
+    /**
+     * @dataProvider priorityDataProvider
+     *
+     * @param int $priority
+     */
+    public function testPriority(int $priority): void
     {
-        return [
-            [
-                ['foo@example.com'],
-                ['foo@example.com' => null],
-            ],
-            [
-                ['foo@example.com', 'bar@example.com'],
-                ['foo@example.com' => null, 'bar@example.com' => null],
-            ],
-            [
-                ['foo@example.com' => 'foo'],
-                ['foo@example.com' => 'foo'],
-            ],
-            [
-                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
-                ['foo@example.com' => 'foo', 'bar@example.com' => 'bar'],
-            ],
-        ];
+        $message = $this->message->withPriority($priority);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($priority, $message->getPriority());
     }
 
     public function testReturnPath(): void
     {
         $address = 'foo@exmaple.com';
-        $message = $this->createMessage()->setReturnPath($address);
-        $this->assertEquals($address, $message->getReturnPath());
+        $message = $this->message->withReturnPath($address);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($address, $message->getReturnPath());
     }
 
-    /**
-     * @dataProvider dataProviderPriorities
-     */
-    public function testPriority(int $priority): void
-    {
-        $message = $this->createMessage()->setPriority($priority);
-        $this->assertEquals($priority, $message->getPriority());
-    }
-
-    public function dataProviderPriorities(): array
-    {
-        return [
-            [\Swift_Mime_SimpleMessage::PRIORITY_HIGHEST],
-            [\Swift_Mime_SimpleMessage::PRIORITY_HIGH],
-            [\Swift_Mime_SimpleMessage::PRIORITY_NORMAL],
-            [\Swift_Mime_SimpleMessage::PRIORITY_LOW],
-            [\Swift_Mime_SimpleMessage::PRIORITY_LOWEST],
-        ];
-    }
-
-    /**
-     * @dataProvider dataProviderHeaders
-     */
-    public function testHeader(string $name, $value, $expected): void
-    {
-        $message = $this->createMessage();
-        $this->assertEmpty($message->getHeader($name));
-        $message->setHeader($name, $value);
-        $this->assertEquals($expected, $message->getHeader($name));
-    }
-
-    public function dataProviderHeaders(): array
+    public function headerDataProvider(): array
     {
         return [
             ['X-Foo', 'Bar', ['Bar']],
@@ -227,39 +221,62 @@ class MessageTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider headerDataProvider
+     *
+     * @param string $name
+     * @param array|string $value
+     * @param array $expected
+     */
+    public function testHeader(string $name, $value, array $expected): void
+    {
+        $message = $this->message->withHeader($name, $value);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getHeader($name));
+    }
+
+    /**
+     * @dataProvider headerDataProvider
+     *
+     * @param string $name
+     * @param array|string $value
+     * @param array $expected
+     */
+    public function testHeaders(string $name, $value, array $expected): void
+    {
+        $message = $this->message->withHeaders([$name => $value]);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($expected, $message->getHeader($name));
+    }
+
     public function testTextBody(): void
     {
-        $body = 'Dear foo';
-        $message = $this->createMessage()
-            ->setTextBody($body);
-        $this->assertEquals($body, $message->getTextBody());
+        $body = 'Plain text';
+        $message = $this->message->withTextBody($body);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($body, $message->getTextBody());
     }
 
     public function testHtmlBody(): void
     {
-        $body = '<p>Dear foo</p>';
-        $message = $this->createMessage()
-            ->setHtmlBody($body);
-        $this->assertEquals($body, $message->getHtmlBody());
+        $body = '<p>HTML content</p>';
+        $message = $this->message->withHtmlBody($body);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($body, $message->getHtmlBody());
     }
 
-    public function testClone(): void
+    public function testError(): void
     {
-        $m1 = new Message();
-        $m1->setFrom('user@example.com');
-        $m2 = clone $m1;
-        $m1->setTo(['user1@example.com' => 'user1']);
-        $m2->setTo(['user2@example.com' => 'user2']);
+        $this->assertNull($this->message->getError());
 
-        $this->assertEquals(['user1@example.com' => 'user1'], $m1->getTo());
-        $this->assertEquals(['user2@example.com' => 'user2'], $m2->getTo());
+        $error = new Exception('Some error.');
+        $message = $this->message->withError($error);
 
-        $messageWithoutSwiftInitialized = new Message();
-        $m2 = clone $messageWithoutSwiftInitialized; // should be no error during cloning
-        $this->assertTrue($m2 instanceof Message);
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($error, $message->getError());
     }
 
-    public function testSetupHeaderShortcuts(): void
+    public function testToString(): void
     {
         $charset = 'utf-16';
         $subject = 'Test Subject';
@@ -271,18 +288,19 @@ class MessageTest extends TestCase
         $returnPath = 'bounce@somedomain.com';
         $readReceiptTo = 'notify@somedomain.com';
 
-        $messageString = $this->createMessage()
-            ->setCharset($charset)
-            ->setSubject($subject)
-            ->setFrom($from)
-            ->setReplyTo($replyTo)
-            ->setTo($to)
-            ->setCc($cc)
-            ->setBcc($bcc)
-            ->setReturnPath($returnPath)
-            ->setPriority(2)
-            ->setReadReceiptTo($readReceiptTo)
-            ->toString();
+        $messageString = $this->message
+            ->withCharset($charset)
+            ->withSubject($subject)
+            ->withFrom($from)
+            ->withReplyTo($replyTo)
+            ->withTo($to)
+            ->withCc($cc)
+            ->withBcc($bcc)
+            ->withReturnPath($returnPath)
+            ->withPriority(2)
+            ->withReadReceiptTo($readReceiptTo)
+            ->__toString()
+        ;
 
         $this->assertStringContainsString('charset=' . $charset, $messageString, 'Incorrect charset!');
         $this->assertStringContainsString('Subject: ' . $subject, $messageString, 'Incorrect "Subject" header!');
@@ -296,51 +314,53 @@ class MessageTest extends TestCase
         $this->assertStringContainsString('Disposition-Notification-To: ' . $readReceiptTo, $messageString, 'Incorrect "Disposition-Notification-To" header!');
     }
 
-    public function testSetupHeaders(): void
+    public function testHeadersAndToString(): void
     {
-        $messageString = $this->createMessage()
-            ->addHeader('Some', 'foo')
-            ->addHeader('Multiple', 'value1')
-            ->addHeader('Multiple', 'value2')
-            ->toString();
+        $messageString = $this->message
+            ->withAddedHeader('Some', 'foo')
+            ->withAddedHeader('Multiple', 'value1')
+            ->withAddedHeader('Multiple', 'value2')
+            ->__toString()
+        ;
 
         $this->assertStringContainsString('Some: foo', $messageString, 'Unable to add header!');
         $this->assertStringContainsString('Multiple: value1', $messageString, 'First value of multiple header lost!');
         $this->assertStringContainsString('Multiple: value2', $messageString, 'Second value of multiple header lost!');
 
-        $messageString = $this->createMessage()
-            ->setHeader('Some', 'foo')
-            ->setHeader('Some', 'override')
-            ->setHeader('Multiple', ['value1', 'value2'])
-            ->toString();
+        $messageString = $this->message
+            ->withHeader('Some', 'foo')
+            ->withHeader('Some', 'override')
+            ->withHeader('Multiple', ['value1', 'value2'])
+            ->__toString()
+        ;
 
         $this->assertStringContainsString('Some: override', $messageString, 'Unable to set header!');
         $this->assertStringNotContainsString('Some: foo', $messageString, 'Unable to override header!');
         $this->assertStringContainsString('Multiple: value1', $messageString, 'First value of multiple header lost!');
         $this->assertStringContainsString('Multiple: value2', $messageString, 'Second value of multiple header lost!');
 
-        $message = $this->createMessage();
-        $message->setHeader('Some', 'foo');
-        $this->assertEquals(['foo'], $message->getHeader('Some'));
-        $message->setHeader('Multiple', ['value1', 'value2']);
-        $this->assertEquals(['value1', 'value2'], $message->getHeader('Multiple'));
+        $message = $this->message->withHeader('Some', 'foo');
+        $this->assertSame(['foo'], $message->getHeader('Some'));
 
-        $message = $this->createMessage()
-            ->setHeaders([
-                'Some' => 'foo',
-                'Multiple' => ['value1', 'value2'],
-            ]);
-        $this->assertEquals(['foo'], $message->getHeader('Some'));
-        $this->assertEquals(['value1', 'value2'], $message->getHeader('Multiple'));
+        $newMessage = $message->withHeader('Multiple', ['value1', 'value2']);
+        $this->assertNotSame($message, $newMessage);
+        $this->assertSame(['value1', 'value2'], $newMessage->getHeader('Multiple'));
+
+        $newMessage2 = $this->message->withHeaders(['Some' => 'foo', 'Multiple' => ['value1', 'value2']]);
+        $this->assertSame(['foo'], $newMessage2->getHeader('Some'));
+        $this->assertSame(['value1', 'value2'], $newMessage2->getHeader('Multiple'));
     }
 
     public function testSerialize(): void
     {
-        $message = $this->createMessage()
-            ->setTo('to@example.com')
-            ->setFrom('someuser@somedomain.com')
-            ->setSubject('Yii Swift Alternative Body Test')
-            ->setTextBody('Yii Swift test plain text body');
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Alternative Body Test')
+            ->withTextBody('Yii Swift test plain text body')
+        ;
+
+        $this->assertNotSame($this->message, $message);
 
         $serializedMessage = serialize($message);
         $this->assertNotEmpty($serializedMessage, 'Unable to serialize message!');
@@ -351,153 +371,161 @@ class MessageTest extends TestCase
 
     public function testSetBodyWithSameContentType()
     {
-        $message = $this->createMessage();
-        $message->setHtmlBody('body1');
-        $message->setHtmlBody('body2');
-        $this->assertEquals('body2', $message->getHtmlBody());
+        $message1 = $this->message->withHtmlBody('body1');
+        $this->assertNotSame($this->message, $message1);
+        $this->assertSame('body1', $message1->getHtmlBody());
+
+        $message2 = $message1->withHtmlBody('body2');
+        $this->assertNotSame($message1, $message2);
+        $this->assertSame('body2', $message2->getHtmlBody());
     }
 
     public function testAlternativeBodyCharset(): void
     {
-        $message = $this->createMessage();
         $charset = 'windows-1251';
-        $message->setCharset($charset);
+        $message = $this->message
+            ->withCharset($charset)
+            ->withTextBody('some text')
+            ->withHtmlBody('some html')
+        ;
 
-        $message->setTextBody('some text');
-        $message->setHtmlBody('some html');
-        $content = $message->toString();
-        $this->assertEquals(2, substr_count($content, $charset), 'Wrong charset for alternative body.');
+        $this->assertNotSame($this->message, $message);
+        $this->assertSame(2, substr_count((string) $message, $charset), 'Wrong charset for alternative body.');
 
-        $message->setTextBody('some text override');
-        $content = $message->toString();
-        $this->assertEquals(2, substr_count($content, $charset), 'Wrong charset for alternative body override.');
+        $message = $message->withTextBody('some text override');
+        $this->assertSame(2, substr_count((string) $message, $charset), 'Wrong charset for alternative body override.');
     }
 
     public function testSendAlternativeBody()
     {
-        $message = $this->createMessage()
-            ->setTo('to@example.com')
-            ->setFrom('someuser@somedomain.com')
-            ->setSubject('Yii Swift Alternative Body Test')
-            ->setHtmlBody('<b>Yii Swift</b> test HTML body')
-            ->setTextBody('Yii Swift test plain text body');
+        $messageParts = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Alternative Body Test')
+            ->withHtmlBody('<b>Yii Swift</b> test HTML body')
+            ->withTextBody('Yii Swift test plain text body')
+            ->getSwiftMessage()
+            ->getChildren()
+        ;
 
-        $messageParts = $message->getSwiftMessage()->getChildren();
         $textPresent = false;
         $htmlPresent = false;
+
         foreach ($messageParts as $part) {
-            if (!($part instanceof \Swift_Mime_Attachment)) {
-                /* @var $part \Swift_Mime_MimePart */
+            if ($part instanceof Swift_Mime_MimePart) {
                 if ($part->getContentType() == 'text/plain') {
                     $textPresent = true;
                 }
+
                 if ($part->getContentType() == 'text/html') {
                     $htmlPresent = true;
                 }
             }
         }
+
         $this->assertTrue($textPresent, 'No text!');
         $this->assertTrue($htmlPresent, 'No HTML!');
     }
 
-    public function testEmbedContent(): void
-    {
-        $fileFullName = $this->createImageFile('embed_file.jpg', 'Embed Image File');
-        $message = $this->createMessage();
-
-        $fileName = basename($fileFullName);
-        $contentType = 'image/jpeg';
-        $fileContent = file_get_contents($fileFullName);
-
-        $cid = $message->embedContent($fileContent, ['fileName' => $fileName, 'contentType' => $contentType]);
-
-        $message->setTo('to@example.com');
-        $message->setFrom('someuser@somedomain.com');
-        $message->setSubject('Yii Swift Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
-
-        $attachment = $this->getAttachment($message);
-        $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertEquals($fileName, $attachment->getFilename(), 'Invalid file name!');
-        $this->assertEquals($contentType, $attachment->getContentType(), 'Invalid content type!');
-    }
-
     public function testAttachFile(): void
     {
-        $message = $this->createMessage();
+        $file = File::fromPath(__FILE__, 'test.php', 'application/x-php');
 
-        $message->setTo('to@example.com');
-        $message->setFrom('someuser@somedomain.com');
-        $message->setSubject('Yii Swift Attach File Test');
-        $message->setTextBody('Yii Swift Attach File Test body');
-        $fileName = __FILE__;
-        $options = [
-            'fileName' => $fileName,
-            'contentType' => 'application/x-php',
-        ];
-        $message->attach($fileName, $options);
-
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Attach File Test')
+            ->withTextBody('Yii Swift Attach File Test body')
+            ->withAttached($file)
+        ;
         $attachment = $this->getAttachment($message);
+
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertStringContainsString($attachment->getFilename(), $options['fileName'], 'Invalid file name!');
-        $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($attachment->getFilename(), $file->name(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
     public function testAttachContent(): void
     {
-        $message = $this->createMessage();
+        $file = File::fromContent('Test attachment content', 'test.txt', 'text/plain');
 
-        $message->setTo('to@example.com');
-        $message->setFrom('someuser@somedomain.com');
-        $message->setSubject('Yii Swift Create Attachment Test');
-        $message->setTextBody('Yii Swift Create Attachment Test body');
-        $fileName = 'test.txt';
-        $fileContent = 'Test attachment content';
-        $options = ['fileName' => $fileName, 'contentType' => 'text/plain'];
-        $message->attachContent($fileContent, $options);
-
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Attach Content Test')
+            ->withTextBody('Yii Swift Attach Content Test body')
+            ->withAttached($file)
+        ;
         $attachment = $this->getAttachment($message);
+
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertEquals($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
-        $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($attachment->getFilename(), $file->name(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
     public function testEmbedFile(): void
     {
-        $fileName = $this->createImageFile('embed_file.jpg', 'Embed Image File');
+        $path = $this->createImageFile('embed-file.jpg', 'Embed Image File');
+        $file = File::fromPath($path, basename($path), 'image/jpeg');
 
-        $message = $this->createMessage();
-
-        $options = ['fileName' => $fileName, 'contentType' => 'image/jpeg'];
-        $cid = $message->embed($fileName, $options);
-
-        $message->setTo('to@example.com');
-        $message->setFrom('someuser@somedomain.com');
-        $message->setSubject('Yii Swift Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
-
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Embed File Test')
+            ->withHtmlBody('Embed image: <img src="' . $file->cid() . '" alt="pic">')
+            ->withEmbedded($file)
+        ;
         $attachment = $this->getAttachment($message);
+
+        $this->assertNotSame($this->message, $message);
         $this->assertIsObject($attachment, 'No attachment found!');
-        $this->assertStringContainsString($attachment->getFilename(), $fileName, 'Invalid file name!');
-        $this->assertEquals($options['fileName'], $attachment->getFilename(), 'Invalid file name!');
-        $this->assertEquals($options['contentType'], $attachment->getContentType(), 'Invalid content type!');
+        $this->assertSame($attachment->getFilename(), $file->name(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
-    /**
-     * @dataProvider dataProviderSigners
-     */
-    public function testAttachSigners(\Swift_Signer ... $signers): void
+    public function testEmbedContent(): void
     {
-        $message = $this->createMessage();
-        $message->attachSigners($signers);
+        $path = $this->createImageFile('embed-file.jpg', 'Embed Image File');
+        $file = File::fromContent(file_get_contents($path), basename($path), 'image/jpeg');
 
-        $property = new \ReflectionProperty(\Swift_Message::class, 'headerSigners');
-        $property->setAccessible(true);
-        $headerSigners = $property->getValue($message->getSwiftMessage());
-        $this->assertEquals($signers, $headerSigners);
+        $message = $this->message
+            ->withTo('to@example.com')
+            ->withFrom('someuser@somedomain.com')
+            ->withSubject('Yii Swift Embed Content Test')
+            ->withHtmlBody('Embed image: <img src="' . $file->cid() . '" alt="pic">')
+            ->withEmbedded($file)
+        ;
+        $attachment = $this->getAttachment($message);
+
+        $this->assertNotSame($this->message, $message);
+        $this->assertIsObject($attachment, 'No attachment found!');
+        $this->assertSame($file->name(), $attachment->getFilename(), 'Invalid file name!');
+        $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
-    private $privateKey = '-----BEGIN RSA PRIVATE KEY-----
+    private function getAttachment(Message $message): ?Swift_Mime_Attachment
+    {
+        $messageParts = $message->getSwiftMessage()->getChildren();
+
+        $attachment = null;
+
+        foreach ($messageParts as $part) {
+            if ($part instanceof Swift_Mime_Attachment) {
+                $attachment = $part;
+                break;
+            }
+        }
+
+        return $attachment;
+    }
+
+    public function signerDataProvider(): array
+    {
+        $domain = 'example.com';
+        $selector = 'default';
+        $privateKey = '-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAyehiMTRxvfQz8nbQQAgL481QipVMF+E7ljWKHTQQSYfqktR+
 zFYqX81vKeK9/2D6AiK5KJSBVdF7aURasppuDaxFJWrPvacd3IQCrGxsGkwwlWPO
 ggB1WpOEKhVUZnGzdm96Fk23oHFKrEiQlSG0cB9P/wUKz57b8tsaPve5sKBG0Kww
@@ -525,36 +553,40 @@ hQGpKaZBDDCHLk7dDzoKXF1udriW9EcImh09uIKGYYWS8poy8NUzmZ3fy/1o2C2O
 U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
 -----END RSA PRIVATE KEY-----
 ';
-
-    public function dataProviderSigners(): array
-    {
-        $domain = 'example.com';
-        $selector = 'default';
-
         return [
-            [new \Swift_Signers_DKIMSigner($this->privateKey, $domain, $selector)],
-            [new \Swift_Signers_DKIMSigner($this->privateKey, $domain, $selector), new \Swift_Signers_DomainKeySigner($this->privateKey, $domain, $selector)],
+            [new Swift_Signers_DKIMSigner($privateKey, $domain, $selector)],
+            [
+                new Swift_Signers_DKIMSigner($privateKey, $domain, $selector),
+                new Swift_Signers_DomainKeySigner($privateKey, $domain, $selector),
+            ],
         ];
     }
 
     /**
-     * Creates image file with given text.
+     * @dataProvider signerDataProvider
      *
-     * @param  string $fileName file name.
-     * @param  string $text     text to be applied on image.
-     *
-     * @return string image file full name.
+     * @param Swift_Signer ...$signers
      */
-    protected function createImageFile(string $fileName = 'test.jpg', string $text = 'Test Image'): string
+    public function testAttachSigners(Swift_Signer ...$signers): void
+    {
+        $message = $this->message->withAttachedSigners($signers);
+        $this->assertNotSame($this->message, $message);
+        $this->assertSame($signers, $this->getInaccessibleProperty($message->getSwiftMessage(), 'headerSigners'));
+    }
+
+    private function createImageFile(string $fileName = 'test.jpg', string $text = 'Test Image'): string
     {
         if (!function_exists('imagejpeg')) {
             $this->markTestSkipped('GD lib required.');
         }
+
         $fileFullName = $this->getTestFilePath() . DIRECTORY_SEPARATOR . $fileName;
         $image = \imagecreatetruecolor(120, 20);
+
         if ($image === false) {
-            throw new \RuntimeExceptio('Unable create a new true color image');
+            throw new RuntimeException('Unable create a new true color image');
         }
+
         $textColor = \imagecolorallocate($image, 233, 14, 91);
         \imagestring($image, 1, 5, 5, $text, $textColor);
         \imagejpeg($image, $fileFullName);
@@ -563,41 +595,19 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
         return $fileFullName;
     }
 
-    /**
-     * Finds the attachment object in the message.
-     *
-     * @param  Message                     $message message instance
-     *
-     * @return \Swift_Mime_Attachment|null attachment instance.
-     */
-    protected function getAttachment(Message $message)
+    private function getTestFilePath(): string
     {
-        $messageParts = $message->getSwiftMessage()->getChildren();
-        $attachment = null;
-        foreach ($messageParts as $part) {
-            if ($part instanceof \Swift_Mime_Attachment) {
-                $attachment = $part;
-                break;
-            }
+        $tempDir = sys_get_temp_dir()
+            . DIRECTORY_SEPARATOR
+            . str_replace('\\', '_', self::class)
+            . '_'
+            . getmypid()
+        ;
+
+        if (!is_dir($tempDir) && mkdir($tempDir, 0777, true) === false) {
+            throw new RuntimeException('Unable to create temporary directory');
         }
 
-        return $attachment;
-    }
-
-    /**
-     * @throws \RuntimeException
-     *
-     * @return string test file path.
-     */
-    protected function getTestFilePath(): string
-    {
-        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR
-            . str_replace('\\', '_', static::class) . '_' . getmypid();
-
-        if (!is_dir($dir) && mkdir($dir, 0777, true) === false) {
-            throw new \RuntimeException('Unable to create temporary directory');
-        }
-
-        return $dir;
+        return $tempDir;
     }
 }

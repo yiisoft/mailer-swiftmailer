@@ -4,55 +4,83 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
+use RuntimeException;
+use Swift_Events_EventListener;
+use Swift_Plugins_AntiFloodPlugin;
+use Swift_Plugins_LoggerPlugin;
+use Swift_Plugins_Loggers_EchoLogger;
+use Swift_Transport;
+use Yiisoft\Mailer\MessageBodyRenderer;
+use Yiisoft\Mailer\MessageFactoryInterface;
+use Yiisoft\Mailer\SwiftMailer\Mailer;
 use Yiisoft\Mailer\SwiftMailer\Message;
+use Yiisoft\Mailer\SwiftMailer\Tests\TestAsset\DummyTransport;
 
-class MailerTest extends TestCase
+final class MailerTest extends TestCase
 {
-    public function testSetUp(): void
+    public function testSetup(): void
     {
-        $mailer = $this->getMailer();
-        $this->assertEquals($this->get(TestTransport::class), $mailer->getTransport());
+        $this->assertSame(
+            $this->get(Swift_Transport::class),
+            $this->getInaccessibleProperty($this->createMailer(), 'swiftMailer')->getTransport(),
+        );
     }
 
     public function testSend(): void
     {
-        $mailer = $this->getMailer();
+        $mailer = $this->createMailer();
+
         $message = (new Message())
-            ->setSubject('Hi')
-            ->setTo('to@example.com');
-        $this->assertNull($mailer->send($message));
+            ->withSubject('Hi')
+            ->withTo('to@example.com');
+
+        $mailer->send($message);
+        $transport = $this->getInaccessibleProperty($this->createMailer(), 'swiftMailer')->getTransport();
+        $this->assertSame([$message->getSwiftMessage()], $transport->sentMessages);
 
         $invalidMsg = (new Message())
-            ->setSubject('')
-            ->setTo('to@example.com');
-        $this->expectException(\RuntimeException::class);
+            ->withSubject('')
+            ->withTo('to@example.com');
+
+        $this->expectException(RuntimeException::class);
         $mailer->send($invalidMsg);
+    }
+
+    public function dataProviderPlugins(): array
+    {
+        return [
+            [new Swift_Plugins_LoggerPlugin(new Swift_Plugins_Loggers_EchoLogger(false))],
+            [
+                new Swift_Plugins_LoggerPlugin(new Swift_Plugins_Loggers_EchoLogger(false)),
+                new Swift_Plugins_AntiFloodPlugin(),
+            ],
+        ];
     }
 
     /**
      * @dataProvider dataProviderPlugins
+     *
+     * @param Swift_Events_EventListener ...$plugins
      */
-    public function testRegisterPlugins(\Swift_Events_EventListener ... $plugins): void
+    public function testConstructorWithPlugins(Swift_Events_EventListener ... $plugins): void
     {
-        $mailer = $this->getMailer();
-        $mailer->registerPlugins($plugins);
-
-        $transport = $mailer->getTransport();
-        $this->assertInstanceOf(TestTransport::class, $transport);
+        $transport = $this->getInaccessibleProperty($this->createMailer($plugins), 'swiftMailer')->getTransport();
+        $this->assertInstanceOf(DummyTransport::class, $transport);
 
         foreach ($plugins as $plugin) {
             $this->assertContains($plugin, $transport->plugins);
         }
     }
 
-    public function dataProviderPlugins(): array
+    private function createMailer(array $plugins = []): Mailer
     {
-        return [
-            [new \Swift_Plugins_LoggerPlugin(new \Swift_Plugins_Loggers_EchoLogger(false))],
-            [
-                new \Swift_Plugins_LoggerPlugin(new \Swift_Plugins_Loggers_EchoLogger(false)),
-                new \Swift_Plugins_AntiFloodPlugin(),
-            ],
-        ];
+        return new Mailer(
+            $this->get(MessageFactoryInterface::class),
+            $this->get(MessageBodyRenderer::class),
+            $this->get(EventDispatcherInterface::class),
+            $this->get(Swift_Transport::class),
+            $plugins,
+        );
     }
 }

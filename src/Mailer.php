@@ -5,88 +5,53 @@ declare(strict_types=1);
 namespace Yiisoft\Mailer\SwiftMailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
-use Yiisoft\Mailer\BaseMailer;
-use Yiisoft\Mailer\Composer;
+use RuntimeException;
+use Swift_Events_EventListener;
+use Swift_Mailer;
+use Swift_Transport;
+use Yiisoft\Mailer\Mailer as BaseMailer;
+use Yiisoft\Mailer\MessageBodyRenderer;
 use Yiisoft\Mailer\MessageFactoryInterface;
 use Yiisoft\Mailer\MessageInterface;
 
 /**
  * Mailer implements a mailer based on SwiftMailer.
  *
- * @see http://swiftmailer.org
+ * @see https://swiftmailer.symfony.com
  */
-class Mailer extends BaseMailer
+final class Mailer extends BaseMailer
 {
-    /**
-     * @var \Swift_Mailer Swift mailer instance.
-     */
-    private $swiftMailer;
-
-    /**
-     * Returns transport instance.
-     *
-     * @return \Swift_Transport
-     */
-    public function getTransport(): \Swift_Transport
-    {
-        return $this->swiftMailer->getTransport();
-    }
+    private Swift_Mailer $swiftMailer;
 
     /**
      * @param MessageFactoryInterface $messageFactory
-     * @param Composer $composer
+     * @param MessageBodyRenderer $messageBodyRenderer
      * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface $logger
-     * @param \Swift_Transport $transport
+     * @param Swift_Transport $transport
+     * @param Swift_Events_EventListener[] $plugins
      */
     public function __construct(
         MessageFactoryInterface $messageFactory,
-        Composer $composer,
+        MessageBodyRenderer $messageBodyRenderer,
         EventDispatcherInterface $eventDispatcher,
-        LoggerInterface $logger,
-        \Swift_Transport $transport
+        Swift_Transport $transport,
+        array $plugins = []
     ) {
-        parent::__construct($messageFactory, $composer, $eventDispatcher, $logger);
-        $this->swiftMailer = new \Swift_Mailer($transport);
+        parent::__construct($messageFactory, $messageBodyRenderer, $eventDispatcher);
+        $this->swiftMailer = new Swift_Mailer($transport);
+
+        foreach ($plugins as $plugin) {
+            $this->swiftMailer->registerPlugin($plugin);
+        }
     }
 
     protected function sendMessage(MessageInterface $message): void
     {
         /** @var Message $message */
         $sent = $this->swiftMailer->send($message->getSwiftMessage());
+
         if ($sent === 0) {
-            throw new \RuntimeException('Unable send message');
+            throw new RuntimeException('Unable send message.');
         }
-    }
-
-    /**
-     * Registers plugins.
-     *
-     * @param \Swift_Events_EventListener[] $plugins
-     *
-     * @return self
-     */
-    public function registerPlugins(array $plugins): self
-    {
-        foreach ($plugins as $plugin) {
-            $this->registerPlugin($plugin);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Registers plugin.
-     *
-     * @see \Swift_Mailer::registerPlugins
-     *
-     * @return self
-     */
-    public function registerPlugin(\Swift_Events_EventListener $plugin): self
-    {
-        $this->swiftMailer->registerPlugin($plugin);
-
-        return $this;
     }
 }

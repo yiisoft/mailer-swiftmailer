@@ -12,4 +12,10 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <DocblockTypeContradiction errorLevel="info" />
+        <RedundantCastGivenDocblockType errorLevel="info" />
+        <RedundantConditionGivenDocblockType errorLevel="info" />
+    </issueHandlers>
 </psalm>
