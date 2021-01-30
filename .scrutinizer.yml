@@ -9,9 +9,11 @@ build:
     nodes:
         analysis:
             environment:
-                php:
-                    version: 7.4.12
-                    compile_options: "--enable-gd"
+                php: 7.4.12
+
+            dependencies:
+                override:
+                    - pecl install gd
 
             tests:
                 override:
@@ -19,13 +21,12 @@ build:
 
         tests-and-coverage:
             environment:
-                php:
-                    version: 7.4.12
-                    compile_options: "--enable-gd"
+                php: 7.4.12
 
             dependencies:
                 override:
                     - composer self-update
+                    - pecl install gd
                     - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
             tests:
