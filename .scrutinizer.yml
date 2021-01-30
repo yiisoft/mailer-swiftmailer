@@ -13,7 +13,9 @@ build:
 
             dependencies:
                 before:
-                    - sudo apt-get install -y php-gd
+                    - sudo add-apt-repository ppa:ondrej/php
+                    - sudo apt update
+                    - sudo apt-get install php7.4-gd
 
             tests:
                 override:
@@ -24,6 +26,11 @@ build:
                 php: 7.4.12
 
             dependencies:
+                before:
+                    - sudo add-apt-repository ppa:ondrej/php
+                    - sudo apt update
+                    - sudo apt-get install php7.4-gd
+
                 override:
                     - composer self-update
                     - sudo apt-get install -y php-gd
