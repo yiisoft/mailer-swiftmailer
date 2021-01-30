@@ -467,8 +467,8 @@ final class MessageTest extends TestCase
 
     public function testEmbedFile(): void
     {
-        $path = $this->createImageFile('embed-file.jpg', 'Embed Image File');
-        $file = File::fromPath($path, basename($path), 'image/jpeg');
+        $path = $this->createImageFile('embed-file.png', 'Embed Image File');
+        $file = File::fromPath($path, basename($path), 'image/png');
 
         $message = $this->message
             ->withTo('to@example.com')
@@ -487,8 +487,8 @@ final class MessageTest extends TestCase
 
     public function testEmbedContent(): void
     {
-        $path = $this->createImageFile('embed-file.jpg', 'Embed Image File');
-        $file = File::fromContent(file_get_contents($path), basename($path), 'image/jpeg');
+        $path = $this->createImageFile('embed-file.png', 'Embed Image File');
+        $file = File::fromContent(file_get_contents($path), basename($path), 'image/png');
 
         $message = $this->message
             ->withTo('to@example.com')
@@ -574,9 +574,9 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
         $this->assertSame($signers, $this->getInaccessibleProperty($message->getSwiftMessage(), 'headerSigners'));
     }
 
-    private function createImageFile(string $fileName = 'test.jpg', string $text = 'Test Image'): string
+    private function createImageFile(string $fileName = 'test.png', string $text = 'Test Image'): string
     {
-        if (!function_exists('imagejpeg')) {
+        if (!function_exists('imagepng')) {
             $this->markTestSkipped('GD lib required.');
         }
 
@@ -589,7 +589,7 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
 
         $textColor = \imagecolorallocate($image, 233, 14, 91);
         \imagestring($image, 1, 5, 5, $text, $textColor);
-        \imagejpeg($image, $fileFullName);
+        \imagepng($image, $fileFullName);
         \imagedestroy($image);
 
         return $fileFullName;
