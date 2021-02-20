@@ -17,6 +17,7 @@ use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Mailer\MailerInterface;
 use Yiisoft\Mailer\MessageBodyRenderer;
+use Yiisoft\Mailer\MessageBodyTemplate;
 use Yiisoft\Mailer\MessageFactory;
 use Yiisoft\Mailer\MessageFactoryInterface;
 use Yiisoft\Mailer\SwiftMailer\Mailer;
@@ -93,6 +94,13 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
                     '__class' => MessageBodyRenderer::class,
                     '__construct()' => [
                         'view' => Reference::to(View::class),
+                        'template' => Reference::to(MessageBodyTemplate::class),
+                    ],
+                ],
+
+                MessageBodyTemplate::class => [
+                    '__class' => MessageBodyTemplate::class,
+                    '__construct()' => [
                         'viewPath' => $tempDir,
                         'htmlLayout' => '',
                         'textLayout' => '',
