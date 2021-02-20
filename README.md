@@ -35,6 +35,7 @@ Creating a mailer:
 
 ```php
 use Yiisoft\Mailer\MessageBodyRenderer;
+use Yiisoft\Mailer\MessageBodyTemplate;
 use Yiisoft\Mailer\MessageFactory;
 use Yiisoft\Mailer\SwiftMailer\Mailer;
 use Yiisoft\Mailer\SwiftMailer\Message;
@@ -46,9 +47,11 @@ use Yiisoft\Mailer\SwiftMailer\Message;
  * @var \Yiisoft\View\View $view
  */
 
+$template = new MessageBodyTemplate('/path/to/directory/of/view-files');
+
 $mailer = new Mailer(
     new MessageFactory(Message::class),
-    new MessageBodyRenderer($view, '/path/to/directory/of/view-files'),
+    new MessageBodyRenderer($view, $template),
     $dispatcher,
     $transport,
     $plugins, // By default, an empty array
