@@ -89,7 +89,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
                         'class' => Message::class,
                     ],
                 ],
-                
+
                 MessageBodyRenderer::class => [
                     '__class' => MessageBodyRenderer::class,
                     '__construct()' => [
