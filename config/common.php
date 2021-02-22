@@ -12,7 +12,7 @@ use Yiisoft\Mailer\MessageFactory;
 use Yiisoft\Mailer\MessageFactoryInterface;
 use Yiisoft\Mailer\SwiftMailer\Mailer;
 use Yiisoft\Mailer\SwiftMailer\Message;
-use Yiisoft\View\WebView;
+use Yiisoft\View\View;
 
 /** @var array $params */
 
@@ -20,7 +20,7 @@ return [
     MessageBodyRenderer::class => [
         '__class' => MessageBodyRenderer::class,
         '__construct()' => [
-            Reference::to(WebView::class),
+            Reference::to(View::class),
             static fn (Aliases $aliases) => new MessageBodyTemplate(
                 $aliases->get($params['yiisoft/mailer']['messageBodyTemplate']['viewPath']),
             ),
