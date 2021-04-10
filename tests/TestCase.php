@@ -77,30 +77,30 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
             $this->container = new Container([
                 View::class => [
-                    '__class' => View::class,
-                    '__construct()' => [
+                    'class' => View::class,
+                    'constructor' => [
                         'basePath' => $tempDir,
                     ],
                 ],
 
                 MessageFactoryInterface::class => [
-                    '__class' => MessageFactory::class,
-                    '__construct()' => [
+                    'class' => MessageFactory::class,
+                    'constructor' => [
                         'class' => Message::class,
                     ],
                 ],
 
                 MessageBodyRenderer::class => [
-                    '__class' => MessageBodyRenderer::class,
-                    '__construct()' => [
+                    'class' => MessageBodyRenderer::class,
+                    'constructor' => [
                         'view' => Reference::to(View::class),
                         'template' => Reference::to(MessageBodyTemplate::class),
                     ],
                 ],
 
                 MessageBodyTemplate::class => [
-                    '__class' => MessageBodyTemplate::class,
-                    '__construct()' => [
+                    'class' => MessageBodyTemplate::class,
+                    'constructor' => [
                         'viewPath' => $tempDir,
                         'htmlLayout' => '',
                         'textLayout' => '',
