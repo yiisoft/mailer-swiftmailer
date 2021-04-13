@@ -14,7 +14,7 @@ use Swift_Transport;
 use Yiisoft\Di\Container;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Factory\Definitions\Reference;
+use Yiisoft\Factory\Definition\Reference;
 use Yiisoft\Mailer\MailerInterface;
 use Yiisoft\Mailer\MessageBodyRenderer;
 use Yiisoft\Mailer\MessageBodyTemplate;
@@ -77,21 +77,21 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
             $this->container = new Container([
                 View::class => [
-                    '__class' => View::class,
+                    'class' => View::class,
                     '__construct()' => [
                         'basePath' => $tempDir,
                     ],
                 ],
 
                 MessageFactoryInterface::class => [
-                    '__class' => MessageFactory::class,
+                    'class' => MessageFactory::class,
                     '__construct()' => [
                         'class' => Message::class,
                     ],
                 ],
 
                 MessageBodyRenderer::class => [
-                    '__class' => MessageBodyRenderer::class,
+                    'class' => MessageBodyRenderer::class,
                     '__construct()' => [
                         'view' => Reference::to(View::class),
                         'template' => Reference::to(MessageBodyTemplate::class),
@@ -99,7 +99,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
                 ],
 
                 MessageBodyTemplate::class => [
-                    '__class' => MessageBodyTemplate::class,
+                    'class' => MessageBodyTemplate::class,
                     '__construct()' => [
                         'viewPath' => $tempDir,
                         'htmlLayout' => '',
