@@ -19,13 +19,8 @@ use Yiisoft\Mailer\SwiftMailer\Message;
 use function basename;
 use function file_get_contents;
 use function function_exists;
-use function getmypid;
-use function is_dir;
-use function mkdir;
 use function serialize;
-use function str_replace;
 use function substr_count;
-use function sys_get_temp_dir;
 use function unserialize;
 
 final class MessageTest extends TestCase
@@ -309,7 +304,7 @@ final class MessageTest extends TestCase
         $this->assertStringContainsString('To: ' . $to, $messageString, 'Incorrect "To" header!');
         $this->assertStringContainsString('Cc: ' . $cc, $messageString, 'Incorrect "Cc" header!');
         $this->assertStringContainsString('Bcc: ' . $bcc, $messageString, 'Incorrect "Bcc" header!');
-        $this->assertStringContainsString("Return-Path: <{$returnPath}>", $messageString, 'Incorrect "Return-Path" header!');
+        $this->assertStringContainsString("Return-Path: <$returnPath>", $messageString, 'Incorrect "Return-Path" header!');
         $this->assertStringContainsString('X-Priority: 2 (High)', $messageString, 'Incorrect "Priority" header!');
         $this->assertStringContainsString('Disposition-Notification-To: ' . $readReceiptTo, $messageString, 'Incorrect "Disposition-Notification-To" header!');
     }
@@ -593,21 +588,5 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
         \imagedestroy($image);
 
         return $fileFullName;
-    }
-
-    private function getTestFilePath(): string
-    {
-        $tempDir = sys_get_temp_dir()
-            . DIRECTORY_SEPARATOR
-            . str_replace('\\', '_', self::class)
-            . '_'
-            . getmypid()
-        ;
-
-        if (!is_dir($tempDir) && mkdir($tempDir, 0777, true) === false) {
-            throw new RuntimeException('Unable to create temporary directory');
-        }
-
-        return $tempDir;
     }
 }
