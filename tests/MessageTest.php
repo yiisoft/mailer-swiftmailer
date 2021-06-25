@@ -42,7 +42,7 @@ final class MessageTest extends TestCase
     {
         $this->assertInstanceOf(Swift_Message::class, $this->message->getSwiftMessage());
         $this->assertSame('utf-8', $this->message->getCharset());
-        $this->assertSame([], $this->message->getFrom());
+        $this->assertSame('', $this->message->getFrom());
         $this->assertSame('', $this->message->getTo());
         $this->assertSame('', $this->message->getReplyTo());
         $this->assertSame('', $this->message->getCc());

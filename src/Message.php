@@ -7,6 +7,7 @@ namespace Yiisoft\Mailer\SwiftMailer;
 use Swift_Attachment;
 use Swift_EmbeddedFile;
 use Swift_Message;
+use Swift_Mime_Headers_UnstructuredHeader;
 use Swift_Mime_MimePart;
 use Swift_Signer;
 use Throwable;
@@ -50,7 +51,9 @@ final class Message implements MessageInterface
 
     public function getFrom()
     {
-        return $this->swiftMessage->getFrom() ?? '';
+        /** @var string|string[] $from */
+        $from = $this->swiftMessage->getFrom();
+        return empty($from) ? '' : $from;
     }
 
     public function withFrom($from): self
@@ -62,7 +65,9 @@ final class Message implements MessageInterface
 
     public function getTo()
     {
-        return $this->swiftMessage->getTo() ?? '';
+        /** @var string|string[] $to */
+        $to = $this->swiftMessage->getTo();
+        return empty($to) ? '' : $to;
     }
 
     public function withTo($to): self
@@ -74,7 +79,9 @@ final class Message implements MessageInterface
 
     public function getReplyTo()
     {
-        return $this->swiftMessage->getReplyTo() ?? '';
+        /** @var string|string[] $replyTo */
+        $replyTo = $this->swiftMessage->getReplyTo();
+        return empty($replyTo) ? '' : $replyTo;
     }
 
     public function withReplyTo($replyTo): self
@@ -86,7 +93,9 @@ final class Message implements MessageInterface
 
     public function getCc()
     {
-        return $this->swiftMessage->getCc() ?? '';
+        /** @var string|string[] $cc */
+        $cc = $this->swiftMessage->getCc();
+        return empty($cc) ? '' : $cc;
     }
 
     public function withCc($cc): self
@@ -98,7 +107,9 @@ final class Message implements MessageInterface
 
     public function getBcc()
     {
-        return $this->swiftMessage->getBcc() ?? '';
+        /** @var string|string[] $bcc */
+        $bcc = $this->swiftMessage->getBcc();
+        return empty($bcc) ? '' : $bcc;
     }
 
     public function withBcc($bcc): self
@@ -110,7 +121,8 @@ final class Message implements MessageInterface
 
     public function getSubject(): string
     {
-        return (string) $this->swiftMessage->getSubject() ?? '';
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return (string) $this->swiftMessage->getSubject();
     }
 
     public function withSubject(string $subject): self
@@ -122,7 +134,8 @@ final class Message implements MessageInterface
 
     public function getTextBody(): string
     {
-        return $this->swiftMessage->getBody() ?? '';
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return (string) $this->swiftMessage->getBody();
     }
 
     public function withTextBody(string $text): self
@@ -134,7 +147,8 @@ final class Message implements MessageInterface
 
     public function getHtmlBody(): string
     {
-        return $this->swiftMessage->getBody() ?? '';
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return (string) $this->swiftMessage->getBody();
     }
 
     public function withHtmlBody(string $html): self
@@ -194,6 +208,7 @@ final class Message implements MessageInterface
 
         $headers = [];
 
+        /** @var Swift_Mime_Headers_UnstructuredHeader $header */
         foreach ($headerSet->getAll($name) as $header) {
             $headers[] = $header->getValue();
         }
@@ -269,7 +284,8 @@ final class Message implements MessageInterface
      */
     public function getReturnPath(): string
     {
-        return $this->swiftMessage->getReturnPath() ?? '';
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return (string) $this->swiftMessage->getReturnPath();
     }
 
     /**
@@ -294,6 +310,7 @@ final class Message implements MessageInterface
      */
     public function getPriority(): int
     {
+        /** @psalm-suppress RedundantCastGivenDocblockType */
         return (int) $this->swiftMessage->getPriority();
     }
 
@@ -315,17 +332,19 @@ final class Message implements MessageInterface
     /**
      * Returns the addresses to which a read-receipt will be sent.
      *
-     * @return array|string The receipt receive email addresses.
+     * @return string|string[] The receipt receive email addresses.
      */
     public function getReadReceiptTo()
     {
-        return $this->swiftMessage->getReadReceiptTo() ?? '';
+        /** @var string|string[] $readReceiptTo */
+        $readReceiptTo = $this->swiftMessage->getReadReceiptTo();
+        return empty($readReceiptTo) ? '' : $readReceiptTo;
     }
 
     /**
      * Returns a new instance with the specified ask for a delivery receipt from the recipient to be sent to addresses.
      *
-     * @param array|string $addresses The receipt receive email address(es).
+     * @param string|string[] $addresses The receipt receive email address(es).
      *
      * @return self
      */
