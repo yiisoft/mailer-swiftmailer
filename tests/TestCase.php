@@ -6,15 +6,9 @@ namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use ReflectionClass;
 use Swift_Transport;
-use Yiisoft\Di\Container;
-use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
-use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Factory\Definition\Reference;
+use Yiisoft\Files\FileHelper;
 use Yiisoft\Mailer\MailerInterface;
 use Yiisoft\Mailer\MessageBodyRenderer;
 use Yiisoft\Mailer\MessageBodyTemplate;
@@ -23,8 +17,12 @@ use Yiisoft\Mailer\MessageFactoryInterface;
 use Yiisoft\Mailer\SwiftMailer\Mailer;
 use Yiisoft\Mailer\SwiftMailer\Message;
 use Yiisoft\Mailer\SwiftMailer\Tests\TestAsset\DummyTransport;
+use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\View\View;
 
+use function basename;
+use function str_replace;
 use function sys_get_temp_dir;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
@@ -33,17 +31,27 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        FileHelper::ensureDirectory($this->getTestFilePath());
         $this->getContainer();
     }
 
     protected function tearDown(): void
     {
         $this->container = null;
+        FileHelper::removeDirectory($this->getTestFilePath());
     }
 
     protected function get(string $id)
     {
         return $this->getContainer()->get($id);
+    }
+
+    protected function getTestFilePath(): string
+    {
+        return sys_get_temp_dir()
+            . DIRECTORY_SEPARATOR
+            . basename(str_replace('\\', '_', static::class))
+        ;
     }
 
     /**
@@ -73,45 +81,21 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     private function getContainer(): ContainerInterface
     {
         if ($this->container === null) {
-            $tempDir = sys_get_temp_dir();
+            $tempDir = $this->getTestFilePath();
+            $eventDispatcher = new SimpleEventDispatcher();
+            $view = new View($tempDir, $eventDispatcher);
+            $messageBodyTemplate = new MessageBodyTemplate($tempDir, '', '');
+            $messageBodyRenderer = new MessageBodyRenderer($view, $messageBodyTemplate);
+            $messageFactory = new MessageFactory(Message::class);
+            $transport = new DummyTransport();
 
-            $this->container = new Container([
-                View::class => [
-                    'class' => View::class,
-                    '__construct()' => [
-                        'basePath' => $tempDir,
-                    ],
-                ],
-
-                MessageFactoryInterface::class => [
-                    'class' => MessageFactory::class,
-                    '__construct()' => [
-                        'class' => Message::class,
-                    ],
-                ],
-
-                MessageBodyRenderer::class => [
-                    'class' => MessageBodyRenderer::class,
-                    '__construct()' => [
-                        'view' => Reference::to(View::class),
-                        'template' => Reference::to(MessageBodyTemplate::class),
-                    ],
-                ],
-
-                MessageBodyTemplate::class => [
-                    'class' => MessageBodyTemplate::class,
-                    '__construct()' => [
-                        'viewPath' => $tempDir,
-                        'htmlLayout' => '',
-                        'textLayout' => '',
-                    ],
-                ],
-
-                MailerInterface::class => Mailer::class,
-                LoggerInterface::class => NullLogger::class,
-                Swift_Transport::class => DummyTransport::class,
-                EventDispatcherInterface::class => Dispatcher::class,
-                ListenerProviderInterface::class => Provider::class,
+            $this->container = new SimpleContainer([
+                EventDispatcherInterface::class => $eventDispatcher,
+                MailerInterface::class => new Mailer($messageFactory, $messageBodyRenderer, $eventDispatcher, $transport),
+                MessageBodyRenderer::class => new MessageBodyRenderer($view, $messageBodyTemplate),
+                MessageBodyTemplate::class => $messageBodyTemplate,
+                MessageFactoryInterface::class => $messageFactory,
+                Swift_Transport::class => $transport,
             ]);
         }
 

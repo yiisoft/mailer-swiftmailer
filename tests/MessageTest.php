@@ -19,13 +19,8 @@ use Yiisoft\Mailer\SwiftMailer\Message;
 use function basename;
 use function file_get_contents;
 use function function_exists;
-use function getmypid;
-use function is_dir;
-use function mkdir;
 use function serialize;
-use function str_replace;
 use function substr_count;
-use function sys_get_temp_dir;
 use function unserialize;
 
 final class MessageTest extends TestCase
@@ -42,7 +37,7 @@ final class MessageTest extends TestCase
     {
         $this->assertInstanceOf(Swift_Message::class, $this->message->getSwiftMessage());
         $this->assertSame('utf-8', $this->message->getCharset());
-        $this->assertSame([], $this->message->getFrom());
+        $this->assertSame('', $this->message->getFrom());
         $this->assertSame('', $this->message->getTo());
         $this->assertSame('', $this->message->getReplyTo());
         $this->assertSame('', $this->message->getCc());
@@ -309,7 +304,7 @@ final class MessageTest extends TestCase
         $this->assertStringContainsString('To: ' . $to, $messageString, 'Incorrect "To" header!');
         $this->assertStringContainsString('Cc: ' . $cc, $messageString, 'Incorrect "Cc" header!');
         $this->assertStringContainsString('Bcc: ' . $bcc, $messageString, 'Incorrect "Bcc" header!');
-        $this->assertStringContainsString("Return-Path: <{$returnPath}>", $messageString, 'Incorrect "Return-Path" header!');
+        $this->assertStringContainsString("Return-Path: <$returnPath>", $messageString, 'Incorrect "Return-Path" header!');
         $this->assertStringContainsString('X-Priority: 2 (High)', $messageString, 'Incorrect "Priority" header!');
         $this->assertStringContainsString('Disposition-Notification-To: ' . $readReceiptTo, $messageString, 'Incorrect "Disposition-Notification-To" header!');
     }
@@ -369,7 +364,7 @@ final class MessageTest extends TestCase
         $this->assertEquals($message, $unserializedMessaage, 'Unable to unserialize message!');
     }
 
-    public function testSetBodyWithSameContentType()
+    public function testSetBodyWithSameContentType(): void
     {
         $message1 = $this->message->withHtmlBody('body1');
         $this->assertNotSame($this->message, $message1);
@@ -505,6 +500,31 @@ final class MessageTest extends TestCase
         $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
     }
 
+    public function testImmutability(): void
+    {
+        $file = File::fromContent('Test attachment content', 'test.txt', 'text/plain');
+
+        $this->assertNotSame($this->message, $this->message->withCharset('UTF-8'));
+        $this->assertNotSame($this->message, $this->message->withFrom('from@example.com'));
+        $this->assertNotSame($this->message, $this->message->withTo('to@example.com'));
+        $this->assertNotSame($this->message, $this->message->withReplyTo('replyTo@example.com'));
+        $this->assertNotSame($this->message, $this->message->withCc('cc@example.com'));
+        $this->assertNotSame($this->message, $this->message->withBcc('bcc@example.com'));
+        $this->assertNotSame($this->message, $this->message->withSubject(''));
+        $this->assertNotSame($this->message, $this->message->withTextBody(''));
+        $this->assertNotSame($this->message, $this->message->withHtmlBody(''));
+        $this->assertNotSame($this->message, $this->message->withAttached($file));
+        $this->assertNotSame($this->message, $this->message->withEmbedded($file));
+        $this->assertNotSame($this->message, $this->message->withAddedHeader('name', 'value'));
+        $this->assertNotSame($this->message, $this->message->withHeader('name', 'value'));
+        $this->assertNotSame($this->message, $this->message->withHeaders([]));
+        $this->assertNotSame($this->message, $this->message->withError(new RuntimeException()));
+        $this->assertNotSame($this->message, $this->message->withReturnPath(''));
+        $this->assertNotSame($this->message, $this->message->withPriority(1));
+        $this->assertNotSame($this->message, $this->message->withReadReceiptTo('readReceiptTo@example.com'));
+        $this->assertNotSame($this->message, $this->message->withAttachedSigners([]));
+    }
+
     private function getAttachment(Message $message): ?Swift_Mime_Attachment
     {
         $messageParts = $message->getSwiftMessage()->getChildren();
@@ -593,21 +613,5 @@ U41eAdnQ3dDGzUNedIJkSh6Z0A4VMZIEOag9hPNYqQXZBQgfobvPKw==
         \imagedestroy($image);
 
         return $fileFullName;
-    }
-
-    private function getTestFilePath(): string
-    {
-        $tempDir = sys_get_temp_dir()
-            . DIRECTORY_SEPARATOR
-            . str_replace('\\', '_', self::class)
-            . '_'
-            . getmypid()
-        ;
-
-        if (!is_dir($tempDir) && mkdir($tempDir, 0777, true) === false) {
-            throw new RuntimeException('Unable to create temporary directory');
-        }
-
-        return $tempDir;
     }
 }
