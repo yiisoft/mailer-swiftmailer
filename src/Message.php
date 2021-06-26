@@ -396,7 +396,8 @@ final class Message implements MessageInterface
             }
 
             $this->swiftMessage->setBody(null);
-            $this->swiftMessage->setContentType('');
+            /** @psalm-suppress NullArgument */
+            $this->swiftMessage->setContentType(null);
             $this->swiftMessage->addPart($oldBody, $oldContentType, $charset);
             $this->swiftMessage->addPart($body, $contentType, $charset);
             return;
@@ -406,13 +407,11 @@ final class Message implements MessageInterface
         $partFound = false;
 
         foreach ($parts as $key => $part) {
-            if ($part instanceof Swift_Mime_MimePart) {
-                if ($part->getContentType() === $contentType) {
-                    $charset = $part->getCharset();
-                    unset($parts[$key]);
-                    $partFound = true;
-                    break;
-                }
+            if ($part instanceof Swift_Mime_MimePart && $part->getContentType() === $contentType) {
+                $charset = $part->getCharset();
+                unset($parts[$key]);
+                $partFound = true;
+                break;
             }
         }
 

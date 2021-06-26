@@ -364,7 +364,7 @@ final class MessageTest extends TestCase
         $this->assertEquals($message, $unserializedMessaage, 'Unable to unserialize message!');
     }
 
-    public function testSetBodyWithSameContentType()
+    public function testSetBodyWithSameContentType(): void
     {
         $message1 = $this->message->withHtmlBody('body1');
         $this->assertNotSame($this->message, $message1);
@@ -498,6 +498,31 @@ final class MessageTest extends TestCase
         $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertSame($file->name(), $attachment->getFilename(), 'Invalid file name!');
         $this->assertSame($file->contentType(), $attachment->getContentType(), 'Invalid content type!');
+    }
+
+    public function testImmutability(): void
+    {
+        $file = File::fromContent('Test attachment content', 'test.txt', 'text/plain');
+
+        $this->assertNotSame($this->message, $this->message->withCharset('UTF-8'));
+        $this->assertNotSame($this->message, $this->message->withFrom('from@example.com'));
+        $this->assertNotSame($this->message, $this->message->withTo('to@example.com'));
+        $this->assertNotSame($this->message, $this->message->withReplyTo('replyTo@example.com'));
+        $this->assertNotSame($this->message, $this->message->withCc('cc@example.com'));
+        $this->assertNotSame($this->message, $this->message->withBcc('bcc@example.com'));
+        $this->assertNotSame($this->message, $this->message->withSubject(''));
+        $this->assertNotSame($this->message, $this->message->withTextBody(''));
+        $this->assertNotSame($this->message, $this->message->withHtmlBody(''));
+        $this->assertNotSame($this->message, $this->message->withAttached($file));
+        $this->assertNotSame($this->message, $this->message->withEmbedded($file));
+        $this->assertNotSame($this->message, $this->message->withAddedHeader('name', 'value'));
+        $this->assertNotSame($this->message, $this->message->withHeader('name', 'value'));
+        $this->assertNotSame($this->message, $this->message->withHeaders([]));
+        $this->assertNotSame($this->message, $this->message->withError(new RuntimeException()));
+        $this->assertNotSame($this->message, $this->message->withReturnPath(''));
+        $this->assertNotSame($this->message, $this->message->withPriority(1));
+        $this->assertNotSame($this->message, $this->message->withReadReceiptTo('readReceiptTo@example.com'));
+        $this->assertNotSame($this->message, $this->message->withAttachedSigners([]));
     }
 
     private function getAttachment(Message $message): ?Swift_Mime_Attachment
