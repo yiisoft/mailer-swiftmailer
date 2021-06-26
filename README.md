@@ -89,7 +89,7 @@ For use in the [Yii framework](http://www.yiiframework.com/), see the configurat
 - [`config/common.php`](https://github.com/yiisoft/mailer-swiftmailer/blob/master/config/common.php)
 - [`config/params.php`](https://github.com/yiisoft/mailer-swiftmailer/blob/master/config/params.php)
 
-See [Yii guide to mailing](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/mailing.md) for more info.
+See [Yii guide to mailing](https://github.com/yiisoft/docs/blob/master/guide/en/tutorial/mailing.md) for more info.
 
 ## Testing
 
