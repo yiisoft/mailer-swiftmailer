@@ -1,7 +1,7 @@
 # Yii Mailer Library - Swift Mailer Extension Change Log
 
 
-## 2.0.0 under development
+## 2.0.0 August 24, 2021
 
 - Chg: Use yiisoft/mailer ^2.0 (samdark)
 
