@@ -1,5 +1,10 @@
 # Yii Mailer Library - Swift Mailer Extension Change Log
 
+
+## 3.0.1 under development
+
+- no changes in this release.
+
 ## 3.0.0 August 25, 2021
 
 - New #44: Add methods to `Yiisoft\Mailer\SwiftMailer\Message`: `getDate()`, `withDate()`, `getSender()`, `withSender()` (devanych)
