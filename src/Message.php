@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer;
 
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Swift_Attachment;
 use Swift_EmbeddedFile;
 use Swift_Message;
@@ -25,6 +28,7 @@ use function reset;
 final class Message implements MessageInterface
 {
     private Swift_Message $swiftMessage;
+    private ?DateTimeImmutable $date = null;
     private ?Throwable $error = null;
 
     public function __construct()
@@ -129,6 +133,64 @@ final class Message implements MessageInterface
     {
         $new = clone $this;
         $new->swiftMessage->setSubject($subject);
+        return $new;
+    }
+
+    public function getDate(): ?DateTimeImmutable
+    {
+        return $this->date;
+    }
+
+    public function withDate(DateTimeInterface $date): self
+    {
+        if ($date instanceof DateTime) {
+            $immutable = new DateTimeImmutable('@'.$date->getTimestamp());
+            $date = $immutable->setTimezone($date->getTimezone());
+        }
+
+        $new = $this->withHeader('Date', $date->format(DateTimeInterface::RFC2822));
+        $new->date = $date;
+        return $new;
+    }
+
+    public function getPriority(): int
+    {
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return (int) $this->swiftMessage->getPriority();
+    }
+
+    public function withPriority(int $priority): self
+    {
+        $new = clone $this;
+        $new->swiftMessage->setPriority($priority);
+        return $new;
+    }
+
+    public function getReturnPath(): string
+    {
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return (string) $this->swiftMessage->getReturnPath();
+    }
+
+    public function withReturnPath(string $address): self
+    {
+        $new = clone $this;
+        $new->swiftMessage->setReturnPath($address);
+        return $new;
+    }
+
+    public function getSender(): string
+    {
+        /** @var array<string, null>|null $sender */
+        $sender = $this->swiftMessage->getSender();
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        return empty($sender) ? '' : (string) array_key_first($sender);
+    }
+
+    public function withSender(string $address): self
+    {
+        $new = clone $this;
+        $new->swiftMessage->setSender($address);
         return $new;
     }
 
@@ -275,58 +337,6 @@ final class Message implements MessageInterface
     public function getSwiftMessage(): Swift_Message
     {
         return $this->swiftMessage;
-    }
-
-    /**
-     * Returns the return-path (the bounce address) of this message.
-     *
-     * @return string The bounce email address.
-     */
-    public function getReturnPath(): string
-    {
-        /** @psalm-suppress RedundantCastGivenDocblockType */
-        return (string) $this->swiftMessage->getReturnPath();
-    }
-
-    /**
-     * Returns a new instance with the specified return-path (the bounce address) of this message.
-     *
-     * @param string $address The bounce email address.
-     *
-     * @return self
-     */
-    public function withReturnPath(string $address): self
-    {
-        $new = clone $this;
-        $new->swiftMessage->setReturnPath($address);
-        return $new;
-    }
-
-    /**
-     * Returns the priority of this message.
-     *
-     * @return int The priority value as integer in range: `1..5`,
-     * where 1 is the highest priority and 5 is the lowest.
-     */
-    public function getPriority(): int
-    {
-        /** @psalm-suppress RedundantCastGivenDocblockType */
-        return (int) $this->swiftMessage->getPriority();
-    }
-
-    /**
-     * Returns a new instance with the specified priority of this message.
-     *
-     * @param int $priority The priority value, should be an integer in range: `1..5`,
-     * where 1 is the highest priority and 5 is the lowest.
-     *
-     * @return self
-     */
-    public function withPriority(int $priority): self
-    {
-        $new = clone $this;
-        $new->swiftMessage->setPriority($priority);
-        return $new;
     }
 
     /**

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Mailer\SwiftMailer\Tests;
 
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
 use RuntimeException;
 use Swift_Message;
@@ -47,9 +50,11 @@ final class MessageTest extends TestCase
         $this->assertSame('', $this->message->getHtmlBody());
         $this->assertSame('', $this->message->getReturnPath());
         $this->assertSame('', $this->message->getReadReceiptTo());
+        $this->assertSame('', $this->message->getSender());
         $this->assertSame(Swift_Mime_SimpleMessage::PRIORITY_NORMAL, $this->message->getPriority());
         $this->assertSame([], $this->message->getHeader('header'));
         $this->assertNull($this->message->getError());
+        $this->assertNull($this->message->getDate());
     }
 
     public function testSubject(): void
@@ -177,6 +182,18 @@ final class MessageTest extends TestCase
         $this->assertSame($expected, $message->getReadReceiptTo());
     }
 
+    public function testDate(): void
+    {
+        $date = new DateTime();
+        $message = $this->message->withDate($date);
+
+        $this->assertNotSame($message, $this->message);
+        $this->assertNotSame($date, $message->getDate());
+        $this->assertInstanceOf(DateTimeImmutable::class, $message->getDate());
+        $this->assertSame($date->getTimestamp(), $message->getDate()->getTimestamp());
+        $this->assertSame([$date->format(DateTimeInterface::RFC2822)], $message->getHeader('Date'));
+    }
+
     public function priorityDataProvider(): array
     {
         return [
@@ -206,6 +223,15 @@ final class MessageTest extends TestCase
         $message = $this->message->withReturnPath($address);
         $this->assertNotSame($message, $this->message);
         $this->assertSame($address, $message->getReturnPath());
+    }
+
+    public function testSender(): void
+    {
+        $address = 'foo@exmaple.com';
+        $message = $this->message->withSender($address);
+
+        $this->assertNotSame($message, $this->message);
+        $this->assertSame($address, $message->getSender());
     }
 
     public function headerDataProvider(): array
@@ -504,6 +530,9 @@ final class MessageTest extends TestCase
     {
         $file = File::fromContent('Test attachment content', 'test.txt', 'text/plain');
 
+        $message = clone $this->message;
+        $this->assertNotSame($this->message->getSwiftMessage(), $message->getSwiftMessage());
+
         $this->assertNotSame($this->message, $this->message->withCharset('UTF-8'));
         $this->assertNotSame($this->message, $this->message->withFrom('from@example.com'));
         $this->assertNotSame($this->message, $this->message->withTo('to@example.com'));
@@ -519,8 +548,10 @@ final class MessageTest extends TestCase
         $this->assertNotSame($this->message, $this->message->withHeader('name', 'value'));
         $this->assertNotSame($this->message, $this->message->withHeaders([]));
         $this->assertNotSame($this->message, $this->message->withError(new RuntimeException()));
-        $this->assertNotSame($this->message, $this->message->withReturnPath(''));
+        $this->assertNotSame($this->message, $this->message->withDate(new DateTime()));
         $this->assertNotSame($this->message, $this->message->withPriority(1));
+        $this->assertNotSame($this->message, $this->message->withReturnPath('bounce@example.com'));
+        $this->assertNotSame($this->message, $this->message->withSender('sender@example.com'));
         $this->assertNotSame($this->message, $this->message->withReadReceiptTo('readReceiptTo@example.com'));
         $this->assertNotSame($this->message, $this->message->withAttachedSigners([]));
     }
