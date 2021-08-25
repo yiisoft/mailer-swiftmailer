@@ -17,6 +17,7 @@ use Throwable;
 use Yiisoft\Mailer\File;
 use Yiisoft\Mailer\MessageInterface;
 
+use function is_string;
 use function reset;
 
 /**
@@ -55,9 +56,7 @@ final class Message implements MessageInterface
 
     public function getFrom()
     {
-        /** @var string|string[] $from */
-        $from = $this->swiftMessage->getFrom();
-        return empty($from) ? '' : $from;
+        return $this->normalizeAddresses($this->swiftMessage->getFrom());
     }
 
     public function withFrom($from): self
@@ -69,9 +68,7 @@ final class Message implements MessageInterface
 
     public function getTo()
     {
-        /** @var string|string[] $to */
-        $to = $this->swiftMessage->getTo();
-        return empty($to) ? '' : $to;
+        return $this->normalizeAddresses($this->swiftMessage->getTo());
     }
 
     public function withTo($to): self
@@ -83,9 +80,7 @@ final class Message implements MessageInterface
 
     public function getReplyTo()
     {
-        /** @var string|string[] $replyTo */
-        $replyTo = $this->swiftMessage->getReplyTo();
-        return empty($replyTo) ? '' : $replyTo;
+        return $this->normalizeAddresses($this->swiftMessage->getReplyTo());
     }
 
     public function withReplyTo($replyTo): self
@@ -97,9 +92,7 @@ final class Message implements MessageInterface
 
     public function getCc()
     {
-        /** @var string|string[] $cc */
-        $cc = $this->swiftMessage->getCc();
-        return empty($cc) ? '' : $cc;
+        return $this->normalizeAddresses($this->swiftMessage->getCc());
     }
 
     public function withCc($cc): self
@@ -111,9 +104,7 @@ final class Message implements MessageInterface
 
     public function getBcc()
     {
-        /** @var string|string[] $bcc */
-        $bcc = $this->swiftMessage->getBcc();
-        return empty($bcc) ? '' : $bcc;
+        return $this->normalizeAddresses($this->swiftMessage->getBcc());
     }
 
     public function withBcc($bcc): self
@@ -342,13 +333,11 @@ final class Message implements MessageInterface
     /**
      * Returns the addresses to which a read-receipt will be sent.
      *
-     * @return string|string[] The receipt receive email addresses.
+     * @return string|array<string, string> The receipt receive email addresses.
      */
     public function getReadReceiptTo()
     {
-        /** @var string|string[] $readReceiptTo */
-        $readReceiptTo = $this->swiftMessage->getReadReceiptTo();
-        return empty($readReceiptTo) ? '' : $readReceiptTo;
+        return $this->normalizeAddresses($this->swiftMessage->getReadReceiptTo());
     }
 
     /**
@@ -433,5 +422,32 @@ final class Message implements MessageInterface
         reset($parts);
         $this->swiftMessage->setChildren($parts);
         $this->swiftMessage->addPart($body, $contentType, $charset);
+    }
+
+    /**
+     * Normalizes email addresses and names to the correct format.
+     *
+     * @param mixed $addresses
+     *
+     * @return string|array<string, string>
+     */
+    private function normalizeAddresses($addresses)
+    {
+        if (empty($addresses)) {
+            return '';
+        }
+
+        if (is_string($addresses)) {
+            return $addresses;
+        }
+
+        $normalized = [];
+
+        /** @var mixed $name */
+        foreach ((array) $addresses as $address => $name) {
+            $normalized[(string) $address] = is_string($name) ? $name : '';
+        }
+
+        return $normalized;
     }
 }

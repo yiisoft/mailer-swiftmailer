@@ -87,11 +87,11 @@ final class MessageTest extends TestCase
         return [
             [
                 'foo@example.com',
-                ['foo@example.com' => null],
+                ['foo@example.com' => ''],
             ],
             [
                 ['foo@example.com', 'bar@example.com'],
-                ['foo@example.com' => null, 'bar@example.com' => null],
+                ['foo@example.com' => '', 'bar@example.com' => ''],
             ],
             [
                 ['foo@example.com' => 'foo'],
