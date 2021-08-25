@@ -135,7 +135,7 @@ final class Message implements MessageInterface
     public function withDate(DateTimeInterface $date): self
     {
         if ($date instanceof DateTime) {
-            $immutable = new DateTimeImmutable('@'.$date->getTimestamp());
+            $immutable = new DateTimeImmutable('@' . $date->getTimestamp());
             $date = $immutable->setTimezone($date->getTimezone());
         }
 
@@ -333,7 +333,7 @@ final class Message implements MessageInterface
     /**
      * Returns the addresses to which a read-receipt will be sent.
      *
-     * @return string|array<string, string> The receipt receive email addresses.
+     * @return array<string, string>|string The receipt receive email addresses.
      */
     public function getReadReceiptTo()
     {
@@ -429,7 +429,7 @@ final class Message implements MessageInterface
      *
      * @param mixed $addresses
      *
-     * @return string|array<string, string>
+     * @return array<string, string>|string
      */
     private function normalizeAddresses($addresses)
     {
