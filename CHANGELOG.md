@@ -3,7 +3,7 @@
 
 ## 3.0.1 under development
 
-- no changes in this release.
+- Chg #45: Use definitions from `yiisoft/definitions` in configuration (vjik) 
 
 ## 3.0.0 August 25, 2021
 
