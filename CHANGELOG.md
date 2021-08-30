@@ -1,9 +1,9 @@
 # Yii Mailer Library - Swift Mailer Extension Change Log
 
 
-## 3.0.1 under development
+## 3.0.1 August 30, 2021
 
-- Chg #45: Use definitions from `yiisoft/definitions` in configuration (vjik) 
+- Chg #45: Use definitions from `yiisoft/definitions` in configuration (vjik)
 
 ## 3.0.0 August 25, 2021
 
