@@ -272,7 +272,9 @@ final class Message implements MessageInterface
     public function withAddedHeader(string $name, string $value): self
     {
         $new = clone $this;
-        $new->swiftMessage->getHeaders()->addTextHeader($name, $value);
+        $new->swiftMessage
+            ->getHeaders()
+            ->addTextHeader($name, $value);
         return $new;
     }
 
