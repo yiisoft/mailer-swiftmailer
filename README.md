@@ -61,7 +61,8 @@ $mailer = new Mailer(
 Sending a mail message:
 
 ```php
-$message = $mailer->compose()
+$message = $mailer
+    ->compose()
     ->withFrom('from@domain.com')
     ->withTo('to@domain.com')
     ->withSubject('Message subject')

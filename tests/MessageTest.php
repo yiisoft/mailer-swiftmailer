@@ -190,7 +190,9 @@ final class MessageTest extends TestCase
         $this->assertNotSame($message, $this->message);
         $this->assertNotSame($date, $message->getDate());
         $this->assertInstanceOf(DateTimeImmutable::class, $message->getDate());
-        $this->assertSame($date->getTimestamp(), $message->getDate()->getTimestamp());
+        $this->assertSame($date->getTimestamp(), $message
+            ->getDate()
+            ->getTimestamp());
         $this->assertSame([$date->format(DateTimeInterface::RFC2822)], $message->getHeader('Date'));
     }
 
@@ -558,7 +560,9 @@ final class MessageTest extends TestCase
 
     private function getAttachment(Message $message): ?Swift_Mime_Attachment
     {
-        $messageParts = $message->getSwiftMessage()->getChildren();
+        $messageParts = $message
+            ->getSwiftMessage()
+            ->getChildren();
 
         $attachment = null;
 

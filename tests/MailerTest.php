@@ -23,7 +23,9 @@ final class MailerTest extends TestCase
     {
         $this->assertSame(
             $this->get(Swift_Transport::class),
-            $this->getInaccessibleProperty($this->createMailer(), 'swiftMailer')->getTransport(),
+            $this
+                ->getInaccessibleProperty($this->createMailer(), 'swiftMailer')
+                ->getTransport(),
         );
     }
 
@@ -36,7 +38,9 @@ final class MailerTest extends TestCase
             ->withTo('to@example.com');
 
         $mailer->send($message);
-        $transport = $this->getInaccessibleProperty($this->createMailer(), 'swiftMailer')->getTransport();
+        $transport = $this
+            ->getInaccessibleProperty($this->createMailer(), 'swiftMailer')
+            ->getTransport();
         $this->assertSame([$message->getSwiftMessage()], $transport->sentMessages);
 
         $invalidMsg = (new Message())
@@ -65,7 +69,9 @@ final class MailerTest extends TestCase
      */
     public function testConstructorWithPlugins(Swift_Events_EventListener ... $plugins): void
     {
-        $transport = $this->getInaccessibleProperty($this->createMailer($plugins), 'swiftMailer')->getTransport();
+        $transport = $this
+            ->getInaccessibleProperty($this->createMailer($plugins), 'swiftMailer')
+            ->getTransport();
         $this->assertInstanceOf(DummyTransport::class, $transport);
 
         foreach ($plugins as $plugin) {
