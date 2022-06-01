@@ -1,4 +1,21 @@
 <p align="center">
+    <b>
+        Package closed in favor 
+        <a href="https://github.com/yiisoft/mailer-symfony">Symfony Mailer Extension</a>.
+    </b>
+</p>
+<p align="center">
+    See details in article 
+    <a href="https://symfony.com/blog/the-end-of-swiftmailer">The end of Swiftmailer</a>
+    by Fabien Potencier.
+</p>
+<p align="center">
+    ❌
+</p>
+
+---
+
+<p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="68px">
     </a>
