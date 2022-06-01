@@ -1,6 +1,6 @@
 <p align="center">
     <b>
-        Package closed in favor 
+        This package is deprecated in favor of
         <a href="https://github.com/yiisoft/mailer-symfony">Symfony Mailer Extension</a>.
     </b>
 </p>
